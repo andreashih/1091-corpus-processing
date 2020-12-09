@@ -485,10 +485,5 @@ llr<-function(oa, ob, oc, od, ea, eb, ec, ed) {
   return(2*sum(s1, s2, s3, s4))
 }
 
-
-library(jsonlite)
-
-bg_df <- fromJSON("Boy-Girl-5073-5173.json")
-
 coll.analysis()
 

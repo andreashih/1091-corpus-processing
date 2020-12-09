@@ -1,0 +1,150 @@
+|---------------------------------------------------------------------|
+| This output is provided without any warranty on an as-is basis by   |
+| Stefan Th. Gries <http://www.linguistics.ucsb.edu/faculty/stgries/> |
+| Please cite the program as mentioned in <readme.txt>. Thanks a lot! |
+|---------------------------------------------------------------------|
+
+ Wed Dec  9 11:19:04 2020 
+
+word.freq: frequency of the word in the corpus
+obs.freq: observed frequency of the word with/in  QILAI
+exp.freq: expected frequency of the word with/in QILAI
+faith: percentage of how many instances of the word occur with/in QILAI
+relation: relation of the word to QILAI
+delta.p.constr.to.word: delta p: how much does the word/construction help guess the word?
+delta.p.constr.to.word: delta p: how much does the construction help guess the word/construction?
+coll.strength: index of collocational/collostructional strength: -log10 (Fisher-Yates exact, one-tailed), the higher, the stronger
+
+words	word.freq	obs.freq	exp.freq	relation	faith	delta.p.constr.to.word	delta.p.word.to.constr	coll.strength
+聽	299	30	0.14	attraction	0.1	0.09	0.1	59.53
+加	86	22	0.04	attraction	0.26	0.06	0.26	53.49
+不	5644	48	2.6	attraction	0.01	0.13	0.01	43.72
+相處	423	19	0.19	attraction	0.04	0.05	0.04	31.06
+一	627	12	0.29	attraction	0.02	0.03	0.02	15.4
+實行	8	5	0	attraction	0.62	0.01	0.62	14.95
+獨立	79	7	0.04	attraction	0.09	0.02	0.09	13.94
+想	2442	15	1.12	attraction	0.01	0.04	0.01	11.94
+哭	181	7	0.08	attraction	0.04	0.02	0.04	11.37
+火	11	4	0.01	attraction	0.36	0.01	0.36	10.84
+這聽	3	3	0	attraction	1	0.01	1	10.02
+燒	3	3	0	attraction	1	0.01	1	10.02
+大聲	18	4	0.01	attraction	0.22	0.01	0.22	9.87
+睡一覺	4	3	0	attraction	0.75	0.01	0.75	9.41
+相對	101	5	0.05	attraction	0.05	0.01	0.05	8.82
+比	448	7	0.21	attraction	0.02	0.02	0.02	8.63
+硬	54	4	0.02	attraction	0.07	0.01	0.07	7.86
+潮濕味合	2	2	0	attraction	1	0.01	1	6.68
+韓比	2	2	0	attraction	1	0.01	1	6.68
+打	335	5	0.15	attraction	0.01	0.01	0.01	6.22
+牙	3	2	0	attraction	0.67	0.01	0.67	6.2
+太	488	5	0.22	attraction	0.01	0.01	0.01	5.42
+藏	7	2	0	attraction	0.29	0.01	0.29	5.35
+關	11	2	0.01	attraction	0.18	0.01	0.18	4.94
+懷疑	98	3	0.05	attraction	0.03	0.01	0.03	4.85
+穿	102	3	0.05	attraction	0.03	0.01	0.03	4.8
+相較	14	2	0.01	attraction	0.14	0.01	0.14	4.72
+累積	28	2	0.01	attraction	0.07	0.01	0.07	4.1
+早點	33	2	0.02	attraction	0.06	0.01	0.06	3.96
+存	40	2	0.02	attraction	0.05	0.01	0.05	3.79
+坐	48	2	0.02	attraction	0.04	0.01	0.04	3.63
+讀	54	2	0.02	attraction	0.04	0.01	0.04	3.53
+一多	1	1	0	attraction	1	0	1	3.34
+你關	1	1	0	attraction	1	0	1	3.34
+快牙	1	1	0	attraction	1	0	1	3.34
+兩人加	1	1	0	attraction	1	0	1	3.34
+武裝	1	1	0	attraction	1	0	1	3.34
+拴	1	1	0	attraction	1	0	1	3.34
+洞補	1	1	0	attraction	1	0	1	3.34
+穿戴整齊	1	1	0	attraction	1	0	1	3.34
+剛想	1	1	0	attraction	1	0	1	3.34
+酒就親	1	1	0	attraction	1	0	1	3.34
+動身	1	1	0	attraction	1	0	1	3.34
+都連	1	1	0	attraction	1	0	1	3.34
+就存	1	1	0	attraction	1	0	1	3.34
+幹話講	1	1	0	attraction	1	0	1	3.34
+裡跳	1	1	0	attraction	1	0	1	3.34
+學不	1	1	0	attraction	1	0	1	3.34
+豐腴	1	1	0	attraction	1	0	1	3.34
+理性	77	2	0.04	attraction	0.03	0.01	0.03	3.22
+站	93	2	0.04	attraction	0.02	0.01	0.02	3.06
+我記	2	1	0	attraction	0.5	0	0.5	3.04
+抑鬱	2	1	0	attraction	0.5	0	0.5	3.04
+雀躍	2	1	0	attraction	0.5	0	0.5	3.04
+精實	2	1	0	attraction	0.5	0	0.5	3.04
+轉動	2	1	0	attraction	0.5	0	0.5	3.04
+說	4448	8	2.05	attraction	0	0.02	0	2.92
+疼痛	3	1	0	attraction	0.33	0	0.33	2.86
+搓	3	1	0	attraction	0.33	0	0.33	2.86
+痛苦	123	2	0.06	attraction	0.02	0.01	0.02	2.82
+忙	127	2	0.06	attraction	0.02	0.01	0.02	2.79
+好	2697	6	1.24	attraction	0	0.01	0	2.76
+文明	4	1	0	attraction	0.25	0	0.25	2.74
+抬	4	1	0	attraction	0.25	0	0.25	2.74
+一早	5	1	0	attraction	0.2	0	0.2	2.64
+記	6	1	0	attraction	0.17	0	0.17	2.56
+標	6	1	0	attraction	0.17	0	0.17	2.56
+相比	7	1	0	attraction	0.14	0	0.14	2.49
+預備	8	1	0	attraction	0.12	0	0.12	2.43
+隨和	9	1	0	attraction	0.11	0	0.11	2.38
+應對	12	1	0.01	attraction	0.08	0	0.08	2.26
+打理	13	1	0.01	attraction	0.08	0	0.08	2.22
+講	274	2	0.13	attraction	0.01	0.01	0.01	2.14
+執行	19	1	0.01	attraction	0.05	0	0.05	2.06
+量	19	1	0.01	attraction	0.05	0	0.05	2.06
+人家	307	2	0.14	attraction	0.01	0.01	0.01	2.04
+堅強	21	1	0.01	attraction	0.05	0	0.05	2.02
+留	23	1	0.01	attraction	0.04	0	0.04	1.98
+省	29	1	0.01	attraction	0.03	0	0.03	1.88
+總結	34	1	0.02	attraction	0.03	0	0.03	1.81
+熱絡	38	1	0.02	attraction	0.03	0	0.03	1.76
+收	40	1	0.02	attraction	0.02	0	0.02	1.74
+抱	41	1	0.02	attraction	0.02	0	0.02	1.73
+說明	51	1	0.02	attraction	0.02	0	0.02	1.63
+半夜	54	1	0.02	attraction	0.02	0	0.02	1.61
+早上	55	1	0.03	attraction	0.02	0	0.02	1.6
+隔天	62	1	0.03	attraction	0.02	0	0.02	1.55
+拉	67	1	0.03	attraction	0.01	0	0.01	1.52
+拍	70	1	0.03	attraction	0.01	0	0.01	1.5
+搭	73	1	0.03	attraction	0.01	0	0.01	1.48
+晚餐	75	1	0.03	attraction	0.01	0	0.01	1.47
+麻煩	77	1	0.04	attraction	0.01	0	0.01	1.46
+記得	104	1	0.05	attraction	0.01	0	0.01	1.33
+了	8632	8	3.97	attraction	0	0.01	0	1.32
+說話	130	1	0.06	attraction	0.01	0	0.01	1.24
+算	189	1	0.09	attraction	0.01	0	0	1.08
+曖昧	198	1	0.09	attraction	0.01	0	0	1.06
+認真	220	1	0.1	attraction	0	0	0	1.02
+做	1135	2	0.52	attraction	0	0	0	1.01
+拿	337	1	0.16	attraction	0	0	0	0.84
+推	366	1	0.17	attraction	0	0	0	0.81
+討論	376	1	0.17	attraction	0	0	0	0.8
+等	509	1	0.23	attraction	0	0	0	0.68
+聊天	522	1	0.24	attraction	0	0	0	0.67
+不想	530	1	0.24	attraction	0	0	0	0.66
+吃	720	1	0.33	attraction	0	0	0	0.55
+認識	740	1	0.34	attraction	0	0	0	0.54
+感覺	754	1	0.35	attraction	0	0	0	0.53
+再	929	1	0.43	attraction	0	0	0	0.46
+比較	973	1	0.45	attraction	0	0	0	0.44
+才	1462	1	0.67	attraction	0	0	0	0.31
+的	32632	1	15.01	repulsion	0	-0.04	0	5.44
+你	8806	1	4.05	repulsion	0	-0.01	0	1.06
+就	6598	1	3.04	repulsion	0	-0.01	0	0.72
+也	7303	3	3.36	repulsion	0	0	0	0.25
+
+In order to determine the degree of repulsion of verbs that are not attested with/inQILAI,
+the following table gives the collocational/collostructional strength for all verb frequencies
+in orders of magnitude the corpus size allows for.
+
+
+absents.words	absents.obs.freqs	absents.exp.freqs	relation	absents.delta.p.constr.to.word	absents.delta.p.word.to.constr	absents.collstrengths
+a	10	0	repulsion	0	0	1.13
+b	100	0.05	repulsion	0	0	0.06
+c	1000	0.46	repulsion	0	0	0.02
+d	10000	4.6	repulsion	-0.01	0	0.08
+e	1e+05	46.01	repulsion	-0.13	0	0.49
+
+
+If your collostruction strength is based on p-values, it can be interpreted as follows:
+Coll.strength>3 => p<0.001; coll.strength>2 => p<0.01; coll.strength>1.30103 => p<0.05.
+I'd be happy if you provided me with feedback and acknowledged the use of Coll.analysis 3.2a.

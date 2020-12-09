@@ -1,5 +1,3 @@
 Corpus Size:  754238 
-[1] TRUE
-[1] TRUE
-ize:  347 
+QILAI Construction Size:  347 
 JUEDE Construction Size:  2651 
