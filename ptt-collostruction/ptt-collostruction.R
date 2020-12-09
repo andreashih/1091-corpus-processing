@@ -71,9 +71,9 @@ boy_girl_qilai %>%
 boy_girl_juede %>%
   count(construction, sort=T) %>%
   tidyr::separate(col="construction",
-                  into = c("w1","construction"),
+                  into = c("construction","w2"),
                   sep="\\s") %>%
-  mutate(w1_freq = boy_girl_word$n[match(w1,boy_girl_word$word)]) -> boy_girl_juede_table
+  mutate(w2_freq = boy_girl_word$n[match(w2,boy_girl_word$word)]) -> boy_girl_juede_table
 
 # prepare for coll analysis
 boy_girl_qilai_table %>%
@@ -81,7 +81,7 @@ boy_girl_qilai_table %>%
   write_tsv("qilai.tsv")
 
 boy_girl_juede_table %>%
-  select(w1, w1_freq, n) %>%
+  select(w2, w2_freq, n) %>%
   write_tsv("juede.tsv")
 
 # corpus information
@@ -102,3 +102,16 @@ sink()
 file.create("qilai_results.txt")
 file.create("juede_results.txt")
 
+# load the output txt
+results <-readLines("qilai_results.txt", encoding = "utf-8")
+# subset lines 
+results<-results[-c(1:17, (length(results)-17):length(results))]
+# convert into CSV
+collo_table<-read_tsv(results)
+
+# auto-print
+collo_table %>%
+  filter(relation =="attraction") %>%
+  arrange(desc(coll.strength)) %>%
+  head(100) %>%
+  select(words, coll.strength, everything())
