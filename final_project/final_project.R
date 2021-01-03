@@ -9,6 +9,7 @@ gossiping.tfl <- vec2tfl(gossiping) # making type-freq list
 N(gossiping.tfl) # sample size
 V(gossiping.tfl) # type count
 
+par(mar = rep(2, 4))
 plot(gossiping.tfl) # Zipf ranking
 plot(gossiping.tfl, log="xy") # logarithmic scale recommended
 
@@ -21,7 +22,41 @@ V(gossiping.spc) # type count
 plot(gossiping.spc) # barplot of frequency spectrum
 
 ### Discriptive statistics: vocabulary growth ###
+# VGC lists vocabulary size V(N) at different sample sizes N
 
-gossiping.vgc <- vec2vgc(gossiping, m.max=2)
+gossiping.vgc <- vec2vgc(gossiping, m.max=2) 
 plot(gossiping.vgc, add.m=1:2) # plot all three VGCs
+
+### LNRE Modelling ###
+
+zm <- lnre("zm", spc=gossiping.spc)
+zm.spc <- lnre.spc(zm, N(gossiping.spc))
+plot(gossiping.spc, zm.spc, legend=c("observed", "ZM model"))
+
+zm.vgc <- lnre.vgc(zm, N(gossiping.vgc), m.max=1, variances=TRUE)
+plot(gossiping.vgc, zm.vgc, add.m=1)
+
+fzm <- lnre("fzm", spc=gossiping.spc)
+fzm
+fzm$S
+
+fzm.spc <- lnre.spc(fzm, N(gossiping.spc))
+plot(gossiping.spc, zm.spc, fzm.spc, legend=c("observed", "ZM", "fZM"))
+
+fzm.vgc <- lnre.vgc(fzm, N(gossiping.vgc), m.max=1, variances=TRUE)
+plot(gossiping.vgc, zm.vgc, fzm.vgc, add.m=1, legend=c("observed", "ZM", "fZM"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

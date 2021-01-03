@@ -1,0 +1,681 @@
+---
+title: 'From Texts to Corpora Comparison'
+author: "Shu-Kai Hsieh"
+date: "2015/1/1"
+output:
+  html_document: default
+bibliography: /Users/shukai/LOPE_LexInfo/BIB/corpus.bib
+---
+
+
+
+# Introduction
+
+- **Text** may derive from virtually any source, e.g., newspaper articles, entries in wikipedia, science texts in schools, legal and govenment documents, short stories, or advertisements.
+
+- our approach is to analyze corpora on many levels. This app will unveil the many ways that corpora vary in different contexts.
+
+- 語料庫語言學研究需要回答以下的方法論問題：
+    - 同一研究主題，使用不同語料庫的效應。
+    - 不同主題，所需要的樣本資料。
+    - 跨語言比較所使用的語料庫基準 baseline。
+
+
+# Corpora comparison: reviews
+
+The unit will cover different aspects of corpus analysis 
+regarding the comparision of corpora/subcorpora in the area of 
+register analysis, contrastive analysis (mostly German English) 
+including choosing the right corpora and features, 
+specific aspects of corpus query, post-processing of extracted 
+linguistic evidence, statistical analysis, classification and 
+visualization. 
+
+
+
+
+
+
+
+## Query in Text Corpora
+The unit will cover text encoding, character encoding, 
+regular expressions, search with regular expressions, 
+search in unannotated corpora, simple text search, 
+and search in annotated corpora with a corpus query 
+language (for instance CQP) and search in XML documents using XQuery. 
+
+- text encoding; the most popular standards of text encoding will be
+presented,
+- regular expressions; the concept of a regular expression will be introduced; Students will have a chance to discover the utility of regular expressions and to learn how to formulate regular expressions corresponding to their queries.
+- annotation; different kinds of annotation (structural mark-up, part-of-speech tagging, morphosyntactic annotation, parsing) and different annotation schemes will be presented and their utility for different kinds of research questions will be discussed.
+- the exploration of language corpora. 
+
+
+## Measures
+
+A measure of corpus similarity would be very useful for lexicography
+
+Word frequency lists are cheap and easy to generate so a measure based on 
+them can be used where a detailed comparison of the two corpora is not viable
+
+used the method proposed in Kilgarriff (2001) to assess corpus similarity over 
+a short period of time both within topic and cross topic. 
+
+
+## 實作問題
+- data size 太大，難以線上分析？（所以小文本可上傳，大語料庫則上傳特定格式）
+
+-----------------------
+
+## 斷詞問題導致的計量問題有多嚴重？
+
+用不同指標比較看看
+
+
+```{r}
+library(zipfR)
+```
+
+### 先用構詞衍生力來看
+
+Case 1: Estimating vocabulary size of a productive process (ri- and 重)
+
+
+The data were extracted from a 380 million token
+corpus of newspaper Italian (Baroni et al., 2004), 
+and they consist of all verbal lemmas beginning with the 
+prefix ri- in the corpus (extracted with a mixture of 
+automated methods and manual checking).
+
+* Frequency spectra
+```{r eval=FALSE}
+data(ItaRi.spc)
+summary(ItaRi.spc)
+Vm(ItaRi.spc,1:5)
+
+# "Baayen's P measure" of productivity proposed by Harald Baayen (see, e.g., Baayen, 1992).
+Vm(ItaRi.spc,1) / N(ItaRi.spc)
+par(mfrow=c(1,3))
+plot(ItaRi.spc)
+plot(ItaRi.spc, log="x")
+plot.default(ItaRi.spc, main="Frequency Spectrum")
+
+#A spectrum is often characterized by very high
+# values corresponding to the lowest frequency classes, 
+# and a very long tail of frequency classes with only one 
+# member (i.e., just one word with frequency 100, 
+# just one word with frequency 103, etc.)
+Vm(ItaRi.spc,100)
+# ItaRi.spc$Vm[20]
+```
+
+
+
+* Vocabulary growth curves
+```{r eval=FALSE}
+data(ItaRi.emp.vgc)
+head(ItaRi.emp.vgc)
+summary(ItaRi.emp.vgc)
+
+par(mfrow=c(1,2))
+plot(ItaRi.emp.vgc, add.m=1)
+```
+
+
+
+* Interpolation
+```{r eval=FALSE}
+ItaRi.bin.vgc <- vgc.interp(ItaRi.spc, N(ItaRi.emp.vgc),m.max=1)
+head(ItaRi.bin.vgc)
+
+plot(ItaRi.emp.vgc,ItaRi.bin.vgc,
+     legend=c("observed","interpolated"))
+
+```
+
+
+* Estimating V and other quantities at arbitrary sample sizes 
+
+
+Extrapolate V to larger sample > LNRE model
+Supporting 3 models: 
+1. Generalized Inverse Gauss Poisson (lnre.gigp)
+2. Zipf Mandelbrot (lnre.zm) 
+3. finite Zipf Mandelbrot (lnre.fzm)
+
+```{r eval=FALSE}
+
+ItaRi.fzm <- lnre("fzm", ItaRi.spc, exact=FALSE)
+#ItaRi.zm <- lnre("zm", ItaRi.spc, exact=FALSE)
+#ItaRi.gigp <- lnre("gigp", ItaRi.spc, exact=FALSE)
+summary(ItaRi.fzm)
+
+ItaRi.fzm.spc <- lnre.spc(ItaRi.fzm, N(ItaRi.fzm))
+
+plot(ItaRi.spc,ItaRi.fzm.spc,legend=c("observed","fZM"))
+
+ItaRi.fzm.vgc <- lnre.vgc(ItaRi.fzm, (1:100)*28e+3)
+
+plot(ItaRi.emp.vgc,ItaRi.fzm.vgc,N0=N(ItaRi.fzm), 
+     legend=c("observed","fZM"))
+```
+
+```{r eval=FALSE}
+## Evaluating extrapolation quality
+ItaRi.sub.spc <- sample.spc(ItaRi.spc, N=700000)
+ItaRi.sub.fzm <- lnre("fzm", ItaRi.sub.spc, exact=FALSE)
+ItaRi.sub.fzm
+
+ItaRi.sub.fzm.vgc <- lnre.vgc(ItaRi.sub.fzm,N=N(ItaRi.emp.vgc))
+
+plot(ItaRi.bin.vgc, ItaRi.sub.fzm.vgc, N0=N(ItaRi.sub.fzm),
+     legend=c("interpolated","fZM"))
+```
+
+
+
+* Comparing vocabulary growth curves of different categories
+
+```{r eval=FALSE}
+data(ItaUltra.spc)
+summary(ItaUltra.spc)
+
+ItaUltra.fzm <- lnre("fzm",ItaUltra.spc,exact=FALSE)
+
+ItaUltra.fzm 
+ItaUltra.ext.vgc <- lnre.vgc(ItaUltra.fzm,N(ItaRi.emp.vgc))
+plot(ItaUltra.ext.vgc,ItaRi.bin.vgc,
+     legend=c("ultra-","ri-"))
+
+
+# Interestingly, the extrapolation suggests that ultra-, 
+# while occurring more rarely, has the potential to generate 
+# many more words than the already productive ri- process.
+
+
+## Now let's try different dataset
+data(package="zipfR")
+
+## 比較英文Brown corpus (read.tf1, tf12spc to generate a spc object)
+## 比較 TMC/ASBC/GIGAWORD/WEIBO only word-freq list required!!
+```
+
+*****************
+### Case 2: Estimating lexical coverage
+
+To estimate the proportion of OOV words/types that we will encounter, given a lexicon of a certain size, or, from a different angle, to determine how large our lexicon should be in order to keep the OOV proportion below a certain threshold.
+
+
+1. Estimating the proportion of OOV types and tokens
+given a fixed size lexicon
+```{r eval=FALSE}
+data(Brown100k.spc)
+summary(Brown100k.spc)
+
+Vseen <- V(Brown100k.spc) - Vm(Brown100k.spc,1)
+Vseen
+Vseen / V(Brown100k.spc)
+
+Vm(Brown100k.spc,1) / N(Brown100k.spc)
+
+Brown100k.zm <- lnre("zm", Brown100k.spc)
+Brown100k.zm
+
+
+EV(Brown100k.zm, c(1e6, 10e6,100e6))
+Vseen / EV(Brown100k.zm, c(1e6,10e6,100e6))
+1 - (Vseen / EV(Brown100k.zm, c(1e6,10e6,100e6)))
+
+
+data(Brown.spc)
+EV(Brown100k.zm,N(Brown.spc))
+
+1 - (Vseen / V(Brown.spc))
+1 - (Vseen / EV(Brown100k.zm, N(Brown.spc)))
+
+
+Brown.zm.spc <- lnre.spc(Brown100k.zm, N(Brown.spc))
+
+EV(Brown100k.zm, N(Brown.spc)) - Vseen
+
+sum(Vm(Brown.zm.spc, 1))
+sum(Vm(Brown.zm.spc, 1:2))
+sum(Vm(Brown.zm.spc, 1:6))
+
+Noov.zm <- sum(Vm(Brown.zm.spc, 1:6) * c(1:6))
+Noov.zm
+
+Noov.zm / N(Brown.spc)
+V(Brown.spc) - Vseen
+
+
+sum(Vm(Brown.spc, 1))
+sum(Vm(Brown.spc, 1:2))
+sum(Vm(Brown.spc, 1:13))
+
+Noov.emp <- sum(Vm(Brown.spc, 1:13) * c(1:13))
+Noov.emp
+Noov.emp / N(Brown.spc)
+```
+
+
+
+2. Determining lexicon size
+
+```{r eval=FALSE}
+Brown10M.zm.spc <- lnre.spc(Brown100k.zm, 10e6)
+sum(Vm(Brown10M.zm.spc, 1:18) * c(1:18))
+sum(Vm(Brown10M.zm.spc, 1:18))
+
+EV(Brown100k.zm, 10e6) - sum(Vm(Brown10M.zm.spc, 1:18))
+```
+
+**************
+
+3. DSM
+從 word distribution model 去比較 Brown corpus, ASBS/Gigaword/Plurk /COPENS
+
+
+```{r eval=FALSE}
+## COPENS 
+
+# sum(copens[2])  # 5113481 tokens 
+copens <- read.csv("~/LOPEN/COPENS/COPENS.workshop/fdist_all.csv")
+names(copens) <-c("WORD", "RAW", "FREQ")
+copens.tbl <- copens[1:2]
+
+## tokens
+sum(copens[2])
+
+copens.vec <- copens[1:137874,2]
+copens.tfl <- vec2tfl(copens.vec)
+copens.spc <- vec2spc(copens.vec)
+copens.vgc <- vec2vgc(copens.vec)
+summary(copens.spc)
+
+Vm(copens.spc, 1:5)
+N(copens.spc)
+V(copens.spc)
+plot(copens.spc)
+
+head(copens.vgc)
+summary(copens.vgc)
+#plot(copens.vgc, add.m=1)
+
+copens.bin.vgc <- vgc.interp(copens.spc, 
+                           N(copens.vgc),m.max=1)
+head(copens.bin.vgc)
+plot(copens.vgc, copens.bin.vgc,
+     legend=c("observed","interpolated"))
+```
+
+
+LIVAC 實驗 
+
+
+```{r eval=FALSE}
+## Brown Corpus 一百萬詞目
+data(Brown.spc)
+summary(Brown.spc)
+
+## ASBC 4.0 一千萬詞目(1981 年到 2007)
+asbc.spc <- read.spc("asbc/asbc_frequency_spectrum.txt")
+summary(asbc.spc)
+Vm(asbc.spc,1:5)
+
+## LDC Chinese Gigaword Corpus 六億八千萬詞目
+gigaword.spc <- read.spc("LDC_gigaword/gigaword_frequency_spectrum.txt")
+summary(gigaword.spc)
+Vm(gigaword.spc,1:5)
+
+## NTU Plurk corpus 兩千七百萬詞目
+plurk.spc <- read.spc("~/corpus/Comparison/plurk_frequency_spectrum.txt")
+summary(plurk.spc)
+Vm(plurk.spc,1:5)
+
+Vm(livac.spc,1:10)
+
+## 先把四個語料庫的 N 與 V 並列的 plot 出來
+N(Brown.spc)
+N(asbc.spc) 
+V(asbc.spc)
+N(plurk.spc)
+V(plurk.spc)
+
+
+####### LIVAC
+livac.spc <- read.spc("livac/hk_spectrum.txt")
+summary(livac.spc)
+Vm(livac.spc,1:5)
+N(livac.spc)
+V(livac.spc)
+```
+
+- 比較 Baayen P
+```{r eval=FALSE}
+# "Baayen's P measure" of productivity proposed by Harald Baayen (see, e.g., Baayen, 1992).
+Vm(Brown.spc,1) / N(Brown.spc)
+Vm(gigaword.spc,1)/N(gigaword.spc)
+
+par(mfrow=c(2,2))
+plot(Brown.spc, log= "x",main="Brown")
+#plot(Brown.spc, log="x")
+#plot.default(Brown.spc, main="Frequency Spectrum")
+plot(asbc.spc, log= "x", main="ASBC")
+plot(gigaword.spc, log= "x",main="LDC.Gigaword")
+plot(plurk.spc)
+
+###
+plot(livac.spc, log= "x",main="LIVAC")
+```
+
+- 利用 VGC 來比較
+```{r eval=FALSE}
+
+par(mfrow=c(2,1))
+# Brown
+data(Brown.emp.vgc)
+head(Brown.emp.vgc)
+summary(Brown.emp.vgc)
+plot(Brown.emp.vgc, add.m=1, main="Brown")
+
+
+# ASBC 
+asbc.vgc <- read.vgc("asbc/asbc_vg.txt")
+head(asbc.vgc)
+summary(asbc.vgc)
+plot(asbc.vgc, add.m=1, main = "ASBC")
+
+# Gigaword
+gigaword.vgc <- read.vgc("LDC_gigaword/gigaword_vg.txt")
+head(gigaword.vgc)
+summary(gigaword.vgc)
+plot(gigaword.vgc, add.m=1, main = "LDC_Gigaword")
+
+# Plurk
+# plurk.vgc <- read.vgc("~/corpus/Comparison/plurk_vg.txt")
+# head(asbc.vgc)
+# summary(plurk.vgc)
+# plot(plurk.vgc, add.m=1)
+
+# LIVAC
+livac.vgc <- read.vgc("~/Dropbox/Linguistic.Data/corpus.comparison/livac/hk_vg.txt")
+head(livac.vgc)
+summary(livac.vgc)
+plot(livac.vgc, add.m=1, main = "LIVAC")
+
+
+
+```
+
+
+
+
+- 加入 Baayen proposed 的 binomial interpolation 來看
+```{r eval=FALSE}
+## Brown
+Brown.bin.vgc <- vgc.interp(Brown.spc, 
+                                    N(Brown.emp.vgc),m.max=1)
+head(Brown.bin.vgc)
+plot(Brown.emp.vgc, Brown.bin.vgc,
+     legend=c("observed","interpolated"))
+
+## ASBC
+asbc.bin.vgc <- vgc.interp(asbc.spc, 
+                            N(asbc.vgc),m.max=1)
+head(asbc.bin.vgc)
+plot(asbc.vgc, asbc.bin.vgc,
+     legend=c("observed","interpolated"))
+
+## Gigaword
+gigaword.bin.vgc <- vgc.interp(gigaword.spc, 
+                           N(gigaword.vgc),m.max=1)
+head(asbc.bin.vgc)
+
+
+plot(gigaword.vgc, gigaword.bin.vgc,
+     legend=c("observed","interpolated"), main = "LDC.Gigaword")
+
+## Plurk
+plurk.bin.vgc <- vgc.interp(plurk.spc, 
+                               N(plurk.vgc),m.max=1)
+head(plurk.bin.vgc)
+plot(plurk.vgc, plurk.bin.vgc,
+     legend=c("observed","interpolated"))
+
+
+## LIVAC
+livac.bin.vgc <- vgc.interp(livac.spc, 
+                               N(livac.vgc),m.max=1)
+head(livac.bin.vgc)
+plot(livac.vgc, livac.bin.vgc,
+     legend=c("observed","interpolated"), main = "LIVAC")
+
+
+```
+
+- Estimating V and other quantities at arbitrary sample sizes 
+
+Extrapolate V to larger sample > LNRE model
+Supporting 3 models: (1).Generalized Inverse Gauss Poisson (lnre.gigp)
+(2) Zipf Mandelbrot (lnre.zm) (3) finite Zipf Mandelbrot (lnre.fzm)
+
+```{r eval=FALSE}
+### Brown
+Brown.fzm <- lnre("fzm", Brown.spc, exact=FALSE)
+#ItaRi.zm <- lnre("zm", ItaRi.spc, exact=FALSE)
+#ItaRi.gigp <- lnre("gigp", ItaRi.spc, exact=FALSE)
+summary(Brown.fzm)
+
+Brown.fzm.spc <- lnre.spc(Brown.fzm, N(Brown.fzm))
+plot(Brown.spc, Brown.fzm.spc,legend=c("observed","fZM"))
+
+Brown.fzm.vgc <- lnre.vgc(Brown.fzm, (1:100)*28e+3)
+
+plot(Brown.emp.vgc, Brown.fzm.vgc, N0=N(Brown.fzm), 
+     legend=c("observed","fZM"))
+
+
+### ASBC
+asbc.fzm <- lnre("fzm", asbc.spc, exact=FALSE)
+#ItaRi.zm <- lnre("zm", ItaRi.spc, exact=FALSE)
+#ItaRi.gigp <- lnre("gigp", ItaRi.spc, exact=FALSE)
+summary(asbc.fzm)
+
+asbc.fzm.spc <- lnre.spc(asbc.fzm, N(asbc.fzm))
+plot(asbc.spc, asbc.fzm.spc,legend=c("observed","fZM"))
+
+asbc.fzm.vgc <- lnre.vgc(asbc.fzm, (1:100)*1e9)
+
+plot(asbc.vgc, Brown.fzm.vgc, N0=N(asbc.fzm), 
+     legend=c("observed","fZM"))
+
+### Gigaword
+
+
+gigaword.fzm <- lnre("fzm", gigaword.spc, exact=FALSE)
+#ItaRi.zm <- lnre("zm", ItaRi.spc, exact=FALSE)
+#ItaRi.gigp <- lnre("gigp", ItaRi.spc, exact=FALSE)
+summary(gigaword.fzm)
+
+gigaword.fzm.spc <- lnre.spc(gigaword.fzm, N(gigaword.fzm))
+plot(gigaword.spc, gigaword.fzm.spc,legend=c("observed","fZM"))
+
+gigaword.fzm.vgc <- lnre.vgc(gigaword.fzm, (1:100)*1e9)
+
+plot(gigaword.vgc, gigaword.fzm.vgc, N0=N(gigaword.fzm), 
+     legend=c("observed","fZM"))
+
+
+### plurk
+
+plurk.fzm <- lnre("fzm", plurk.spc, exact=FALSE)
+#ItaRi.zm <- lnre("zm", ItaRi.spc, exact=FALSE)
+#ItaRi.gigp <- lnre("gigp", ItaRi.spc, exact=FALSE)
+summary(plurk.fzm)
+
+plurk.fzm.spc <- lnre.spc(plurk.fzm, N(plurk.fzm))
+plot(plurk.spc, plurk.fzm.spc,legend=c("observed","fZM"))
+
+plurk.fzm.vgc <- lnre.vgc(plurk.fzm, (1:100)*1e9)
+
+plot(plurk.vgc, plurk.fzm.vgc, N0=N(plurk.fzm), 
+     legend=c("observed","fZM"))
+
+```
+
+
+```{r eval=FALSE}
+# ####### Evaluating extrapolation quality
+# ItaRi.sub.spc <- sample.spc(ItaRi.spc, N=700000)
+# ItaRi.sub.fzm <- lnre("fzm", ItaRi.sub.spc, exact=FALSE)
+# ItaRi.sub.fzm
+# 
+# ItaRi.sub.fzm.vgc <- lnre.vgc(ItaRi.sub.fzm,N=N(ItaRi.emp.vgc))
+# 
+# plot(ItaRi.bin.vgc, ItaRi.sub.fzm.vgc, N0=N(ItaRi.sub.fzm),
+#      legend=c("interpolated","fZM"))
+# 
+# 
+# ## Comparing vocabulary growth curves of different categories
+# data(ItaUltra.spc)
+# summary(ItaUltra.spc)
+# 
+# ItaUltra.fzm <- lnre("fzm",ItaUltra.spc,exact=FALSE)
+# 
+# ItaUltra.fzm 
+# ItaUltra.ext.vgc <- lnre.vgc(ItaUltra.fzm,N(ItaRi.emp.vgc))
+# plot(ItaUltra.ext.vgc,ItaRi.bin.vgc,
+#      legend=c("ultra-","ri-"))
+# 
+# 
+# # Interestingly, the extrapolation suggests that ultra-, 
+# # while occurring more rarely, has the potential to generate 
+# # many more words than the already productive ri- process.
+```
+
+
+```{r eval=FALSE}
+## 看看 plurk 詞表。朱學 Na 恆 D
+plurk_word_list <-read.table("~/corpus/Comparison/plurk_word_list.txt", header=F)
+
+
+## Now let's try different dataset
+data(package="zipfR")
+
+## 比較英文Brown corpus (read.tf1, tf12spc to generate a spc object)
+## 比較 TMC/ASBC/GIGAWORD/WEIBO only word-freq list required!!
+
+
+#################
+Case 2: Estimating lexical coverage
+
+# to estimate the proportion of OOV
+words/types that we will encounter, given a lexicon of a certain size, or,
+from a different angle, to determine how large our lexicon should be in order
+to keep the OOV proportion below a certain threshold.
+
+
+# [1] Estimating the proportion of OOV types and tokens
+# given a fixed size lexicon
+
+data(Brown100k.spc)
+summary(Brown100k.spc)
+
+Vseen <- V(Brown100k.spc) - Vm(Brown100k.spc,1)
+Vseen
+Vseen / V(Brown100k.spc)
+
+Vm(Brown100k.spc,1) / N(Brown100k.spc)
+
+Brown100k.zm <- lnre("zm", Brown100k.spc)
+Brown100k.zm
+
+
+EV(Brown100k.zm, c(1e6, 10e6,100e6))
+Vseen / EV(Brown100k.zm, c(1e6,10e6,100e6))
+1 - (Vseen / EV(Brown100k.zm, c(1e6,10e6,100e6)))
+
+
+data(Brown.spc)
+EV(Brown100k.zm,N(Brown.spc))
+
+1 - (Vseen / V(Brown.spc))
+1 - (Vseen / EV(Brown100k.zm, N(Brown.spc)))
+
+
+####
+
+# 200k lemma tokens
+asbc.sub.spc <- sample.spc(asbc.spc, N=200000)
+
+
+
+# 
+# 
+# 
+# Brown.zm.spc <- lnre.spc(Brown100k.zm, N(Brown.spc))
+# 
+# EV(Brown100k.zm, N(Brown.spc)) - Vseen
+# 
+# sum(Vm(Brown.zm.spc, 1))
+# sum(Vm(Brown.zm.spc, 1:2))
+# sum(Vm(Brown.zm.spc, 1:6))
+# 
+# Noov.zm <- sum(Vm(Brown.zm.spc, 1:6) * c(1:6))
+# Noov.zm
+# 
+# Noov.zm / N(Brown.spc)
+# V(Brown.spc) - Vseen
+# 
+# 
+# sum(Vm(Brown.spc, 1))
+# sum(Vm(Brown.spc, 1:2))
+# sum(Vm(Brown.spc, 1:13))
+# 
+# Noov.emp <- sum(Vm(Brown.spc, 1:13) * c(1:13))
+# Noov.emp
+# Noov.emp / N(Brown.spc)
+# 
+
+[2] Determining lexicon size
+
+Brown10M.zm.spc <- lnre.spc(Brown100k.zm, 10e6)
+sum(Vm(Brown10M.zm.spc, 1:18) * c(1:18))
+sum(Vm(Brown10M.zm.spc, 1:18))
+EV(Brown100k.zm, 10e6) - sum(Vm(Brown10M.zm.spc, 1:18))
+
+
+plurk.zm.spc <- lnre.spc(plurk.zm, 10e6)
+sum(Vm(Brown10M.zm.spc, 1:18) * c(1:18))
+sum(Vm(Brown10M.zm.spc, 1:18))
+EV(Brown100k.zm, 10e6) - sum(Vm(Brown10M.zm.spc, 1:18))
+
+```
+
+
+
+# Stylometric Measures
+
+```{r, eval=FALSE}
+library(stylo)
+setwd("~/Dropbox/Linguistic.Data/corpus.comparison/stylo.experiment/")
+report = stylo()
+summary(report)
+report$table.with.all.freqs
+
+
+```
+
+
+## Find the Fingerprint
+
+- Simple Delta measure (Burrows 2002) very successful
+- Frequencies of 100 – 5,000 most frequent words (MFW) form a “fingerprint” of an author’s style
+
+
+
+
+
+
+
