@@ -20,6 +20,8 @@ N(gossiping.spc) # sample size
 V(gossiping.spc) # type count
 
 plot(gossiping.spc) # barplot of frequency spectrum
+plot(gossiping.spc, log="x")
+plot.default(gossiping.spc, main="Frequency Spectrum")
 
 ### Discriptive statistics: vocabulary growth ###
 # VGC lists vocabulary size V(N) at different sample sizes N
@@ -46,7 +48,10 @@ plot(gossiping.spc, zm.spc, fzm.spc, legend=c("observed", "ZM", "fZM"))
 fzm.vgc <- lnre.vgc(fzm, N(gossiping.vgc), m.max=1, variances=TRUE)
 plot(gossiping.vgc, zm.vgc, fzm.vgc, add.m=1, legend=c("observed", "ZM", "fZM"))
 
+# "Baayen's P measure" of productivity proposed by Harald Baayen (see, e.g., Baayen, 1992).
+Vm(gossiping.spc,1) / N(gossiping.spc)
 
+### Estimating the proportion of OOV types and tokens given a fixed size lexicon ###
 
 
 
