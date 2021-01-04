@@ -60,3 +60,48 @@ plot(gossip.vgc, add.m=1:2, main="PTT-Gossiping",
 plot(dcard.vgc, add.m=1:2, main="Dcard",
      xlab="N", ylab="V(N)/V1(N)")
 
+### fitting LNRE model: Zipf-Mandelbrot ###
+
+zm_g <- lnre("zm", spc=gossip.spc)
+zm_d <- lnre("zm", spc=dcard.spc)
+
+# frequency spectra
+zm_g.spc <- lnre.spc(zm_g, N(gossip.spc))
+zm_d.spc <- lnre.spc(zm_d, N(dcard.spc))
+
+par(mfrow=c(1,2)) # 1*2 plot area
+plot(gossip.spc, zm_g.spc,
+     main="PTT-Gossiping", xlab="m", ylab="Vm")
+legend("topright", 
+       legend = c("observed", "ZM model"), 
+       fill = 1:2,
+       cex = 0.75)
+plot(dcard.spc, zm_d.spc,
+     main="Dcard", xlab="m", ylab="Vm")
+legend("topright", 
+       legend = c("observed", "ZM model"), 
+       fill = 1:2,
+       cex = 0.75)
+
+# vocab growth curve
+zm_g.vgc <- lnre.vgc(zm_g, N(gossip.vgc), m.max=1, variances=TRUE)
+zm_d.vgc <- lnre.vgc(zm_d, N(dcard.vgc), m.max=1, variances=TRUE)
+
+par(mfrow=c(1,2)) # 1*2 plot area
+plot(gossip.vgc, zm_g.vgc, add.m=1,
+     main="PTT-Gossiping", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", 
+       legend = c("observed", "ZM model"),
+       fill = 1:2,
+       cex = 0.5)
+plot(dcard.vgc, zm_d.vgc, add.m=1,
+     main="Dcard", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", 
+       legend = c("observed", "ZM model"),
+       fill = 1:2,
+       cex = 0.5)
+
+### fitting LNRE model: finite Zipf-Mandelbrot ###
+
+
+
