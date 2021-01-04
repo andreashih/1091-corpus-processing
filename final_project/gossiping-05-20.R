@@ -127,13 +127,165 @@ plot(gossip15.vgc, add.m=1:2, main="Gossiping 2015",
 plot(gossip20.vgc, add.m=1:2, main="Gossiping 2020",
      xlab="N", ylab="V(N)/V1(N)")
 
+### fitting LNRE model: Zipf-Mandelbrot ###
 
+zm05 <- lnre("zm", spc=gossip05.spc)
+zm10 <- lnre("zm", spc=gossip10.spc)
+zm15 <- lnre("zm", spc=gossip15.spc)
+zm20 <- lnre("zm", spc=gossip20.spc)
 
+# frequency spectra
+zm05.spc <- lnre.spc(zm05, N(gossip05.spc))
+zm10.spc <- lnre.spc(zm10, N(gossip10.spc))
+zm15.spc <- lnre.spc(zm15, N(gossip15.spc))
+zm20.spc <- lnre.spc(zm20, N(gossip20.spc))
 
+dev.new(width=10, height=10) # open new-sized plot window
+par(mfrow=c(2,2)) # 2*2 plot area
+plot(gossip05.spc, zm05.spc,
+     main="Gossiping 2005", xlab="m", ylab="Vm")
+legend("topright", 
+       legend = c("observed", "ZM model"), 
+       fill = 1:2,
+       cex = 0.75)
 
+plot(gossip10.spc, zm10.spc,
+     main="Gossiping 2010", xlab="m", ylab="Vm")
+legend("topright", 
+       legend = c("observed", "ZM model"), 
+       fill = 1:2,
+       cex = 0.75)
 
+plot(gossip15.spc, zm15.spc,
+     main="Gossiping 2015", xlab="m", ylab="Vm")
+legend("topright", 
+       legend = c("observed", "ZM model"), 
+       fill = 1:2,
+       cex = 0.75)
 
+plot(gossip20.spc, zm20.spc,
+     main="Gossiping 2020", xlab="m", ylab="Vm")
+legend("topright", 
+       legend = c("observed", "ZM model"), 
+       fill = 1:2,
+       cex = 0.75)
 
+# vocab growth curve
+zm05.vgc <- lnre.vgc(zm05, N(gossip05.vgc), m.max=1, variances=TRUE)
+zm10.vgc <- lnre.vgc(zm10, N(gossip10.vgc), m.max=1, variances=TRUE)
+zm15.vgc <- lnre.vgc(zm15, N(gossip15.vgc), m.max=1, variances=TRUE)
+zm20.vgc <- lnre.vgc(zm20, N(gossip20.vgc), m.max=1, variances=TRUE)
 
+dev.new(width=10, height=10) # open new-sized plot window
+par(mfrow=c(2,2)) # 2*2 plot area
+
+plot(gossip05.vgc, zm05.vgc, add.m=1,
+     main="Gossiping 2005", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", 
+       legend = c("observed", "ZM model"),
+       fill = 1:2,
+       cex = 0.75)
+
+plot(gossip10.vgc, zm10.vgc, add.m=1,
+     main="Gossiping 2010", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", 
+       legend = c("observed", "ZM model"),
+       fill = 1:2,
+       cex = 0.75)
+
+plot(gossip15.vgc, zm15.vgc, add.m=1,
+     main="Gossiping 2015", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", 
+       legend = c("observed", "ZM model"),
+       fill = 1:2,
+       cex = 0.75)
+
+plot(gossip20.vgc, zm20.vgc, add.m=1,
+     main="Gossiping 2020", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", 
+       legend = c("observed", "ZM model"),
+       fill = 1:2,
+       cex = 0.75)
+
+### fitting LNRE model: finite Zipf-Mandelbrot ###
+
+fzm05 <- lnre("fzm", spc=gossip05.spc)
+fzm10 <- lnre("fzm", spc=gossip10.spc)
+fzm15 <- lnre("fzm", spc=gossip15.spc)
+fzm20 <- lnre("fzm", spc=gossip20.spc)
+
+# frequency spectra
+fzm05.spc <- lnre.spc(fzm05, N(gossip05.spc))
+fzm10.spc <- lnre.spc(fzm10, N(gossip10.spc))
+fzm15.spc <- lnre.spc(fzm15, N(gossip15.spc))
+fzm20.spc <- lnre.spc(fzm20, N(gossip20.spc))
+
+dev.new(width=10, height=10) # open new-sized plot window
+par(mfrow=c(2,2)) # 2*2 plot area
+
+plot(gossip05.spc, zm05.spc, fzm05.spc,
+     main="Gossiping 2005", xlab="m", ylab="Vm")
+legend("topright", 
+       legend = c("observed", "ZM", "fZM"), 
+       fill = 1:3,
+       cex = 0.75)
+
+plot(gossip10.spc, zm10.spc, fzm10.spc,
+     main="Gossiping 2010", xlab="m", ylab="Vm")
+legend("topright", 
+       legend = c("observed", "ZM", "fZM"), 
+       fill = 1:3,
+       cex = 0.75)
+
+plot(gossip15.spc, zm15.spc, fzm15.spc,
+     main="Gossiping 2015", xlab="m", ylab="Vm")
+legend("topright", 
+       legend = c("observed", "ZM", "fZM"), 
+       fill = 1:3,
+       cex = 0.75)
+
+plot(gossip20.spc, zm20.spc, fzm20.spc,
+     main="Gossiping 2020", xlab="m", ylab="Vm")
+legend("topright", 
+       legend = c("observed", "ZM", "fZM"), 
+       fill = 1:3,
+       cex = 0.75)
+
+# vocab growth curve
+fzm05.vgc <- lnre.vgc(fzm05, N(gossip05.vgc), m.max=1, variances=TRUE)
+fzm10.vgc <- lnre.vgc(fzm10, N(gossip10.vgc), m.max=1, variances=TRUE)
+fzm15.vgc <- lnre.vgc(fzm15, N(gossip15.vgc), m.max=1, variances=TRUE)
+fzm20.vgc <- lnre.vgc(fzm20, N(gossip20.vgc), m.max=1, variances=TRUE)
+
+dev.new(width=10, height=10) # open new-sized plot window
+par(mfrow=c(2,2)) # 2*2 plot area
+
+plot(gossip05.vgc, zm05.vgc, fzm05.vgc, add.m=1, 
+     main="Gossiping 2005", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", 
+       legend = c("observed", "ZM", "fZM"), 
+       fill = 1:3,
+       cex = 0.5)    
+     
+plot(gossip10.vgc, zm10.vgc, fzm10.vgc, add.m=1, 
+     main="Gossiping 2010", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", 
+       legend = c("observed", "ZM", "fZM"), 
+       fill = 1:3,
+       cex = 0.5) 
+
+plot(gossip15.vgc, zm15.vgc, fzm15.vgc, add.m=1, 
+     main="Gossiping 2015", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", 
+       legend = c("observed", "ZM", "fZM"), 
+       fill = 1:3,
+       cex = 0.5) 
+
+plot(gossip20.vgc, zm20.vgc, fzm20.vgc, add.m=1, 
+     main="Gossiping 2020", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", 
+       legend = c("observed", "ZM", "fZM"), 
+       fill = 1:3,
+       cex = 0.5) 
 
 
