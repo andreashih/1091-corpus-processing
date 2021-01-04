@@ -1,6 +1,5 @@
 library(zipfR)
-library(ggplot2)
-library(gridExtra)
+library(readr)
 
 # load files
 g05 <- readLines("data\\Gossiping_2005_seg.txt", encoding="UTF-8")
@@ -35,7 +34,29 @@ plot(gossip.tfl, main="PTT-Gossiping", log="xy",
 plot(dcard.tfl, main="Dcard", log="xy",
      xlab="rank", ylab="frequency")
 
+### frequency spectra ###
+gossip.spc <- tfl2spc(gossip.tfl)
+dcard.spc <- tfl2spc(dcard.tfl)
+asbc.spc <- read_table2("data/asbc_frequency_spectrum.txt")
+data(Brown.spc)
 
+par(mfrow=c(2,2)) # 2*2 plot area
+plot(asbc.spc, log="x", main="ASBC",
+     xlab="m", ylab="Vm", type = "o")
+plot(Brown.spc, log="x", main="Brown",
+     xlab="m", ylab="Vm")
+plot(dcard.spc, log="x", main="Dcard",
+     xlab="m", ylab="Vm")
+plot(gossip.spc, log="x", main="PTT-Gossiping",
+     xlab="m", ylab="Vm")
 
+### vocab growth curve ###
+gossip.vgc <- vec2vgc(gossip_corpus, m.max=2)
+dcard.vgc <- vec2vgc(dcard_corpus, m.max=2)
 
+par(mfrow=c(1,2))
+plot(gossip.vgc, add.m=1:2, main="PTT-Gossiping",
+     xlab="N", ylab="V(N)/V1(N)")
+plot(dcard.vgc, add.m=1:2, main="Dcard",
+     xlab="N", ylab="V(N)/V1(N)")
 
