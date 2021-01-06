@@ -2,7 +2,7 @@
 title: "final_project"
 author: "andrea"
 date: "2021/1/6"
-output: html_document
+output: md_document
 ---
 
 這學期修了老闆的課──語料處理方法，認識了一個強大的 R 套件 [`zipfR`](https://cran.r-project.org/web/packages/zipfR/index.html) (Evert and Baroni 2007) 還有 LNRE model (Baayen 2001)。這篇文章將以 PTT 八卦板與 Dcard 語料為例，依據 [The zipfR package for lexical statistics: A tutorial introduction](https://rdrr.io/cran/zipfR/f/inst/doc/zipfr-tutorial.pdf) (Baroni and Evert 2014) 所提供的方法進行分析。
@@ -170,15 +170,15 @@ of-Rare-Events (LNRE) models (Baayen 2001)。
 #### 2.4 Fitting the LNRE Model
 
 `zipfR` 套件中提供了三種 LNRE models，分別是 Generalized In-
-verse Gauss Poisson (`lnre.gigp`; Baayen, 2001, ch. 4), Zipf-Mandelbrot (`lnre.zm`;
-Evert, 2004) and finite Zipf-Mandelbrot (`lnre.fzm`; Evert, 2004). 我們首先採用 `fzm`。
+verse Gauss Poisson (`lnre.gigp`; Baayen, 2001, ch. 4)、Zipf-Mandelbrot (`lnre.zm`;
+Evert, 2004)，和 finite Zipf-Mandelbrot (`lnre.fzm`; Evert, 2004)，我們首先採用 `fzm`。
 
 ```{r}
 fzm_g <- lnre("fzm", spc=gossip.spc)
 fzm_d <- lnre("fzm", spc=dcard.spc)
 ```
 
-我們可以畫出 observed 和 expected spectra：
+畫出 observed 和 expected spectra：
 
 ```{r}
 fzm_g.spc <- lnre.spc(fzm_g, N(gossip.spc))
@@ -271,7 +271,7 @@ gossip100k.zm <- lnre("zm", gossip100k.spc)
 dcard100k.zm <- lnre("zm", dcard100k.spc)
 ```
 
-以八卦板與廖為例，假設我們用 1、10，和 1 億個 tokens 進行計算，expected OOV 分別會是：
+以八卦板語料為例，假設我們用 1、10，和 1 億個 tokens 進行計算，expected OOV 分別會是：
 
 ```{r}
 1 - (gossip_Vseen / EV(gossip100k.zm, c(1e6, 10e6, 100e6)))
@@ -329,7 +329,7 @@ dcard_Noov.zm / N(dcard.spc)
 
 在 Dcard 語料中約有 9% 的 token 屬於 OOV。
 
-
+### 4. 結論
 
 
 
