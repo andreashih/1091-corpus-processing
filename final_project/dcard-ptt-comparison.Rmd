@@ -48,7 +48,7 @@ output: html_document
 
 在這裡，m 表示出現的頻率次數，Vm 表示這個頻率次數的單詞有幾個。所以這個例子中，出現一次的單詞有一個 (橘子)，出現三次的單詞有兩個 (香蕉、葡萄)，出現五次的單詞有一個 (蘋果)。只出現過一次的單詞，我們稱之為 *hapax legomena*。*hapax legomena* 在本研究中可能是斷詞錯誤所造成，接下來將會進行探索。
 
-### 2. 實作
+### 2. 實作 Frequency Distribution Analysis
 
 首先，把 PTT 八卦板和 Dcard 語料整理匯入並整理。這裡先將兩 corpus 存成兩個 character vector。
 
@@ -214,9 +214,11 @@ legend("topleft", legend = c("observed", "fZM model"),
 
 上方的紅色曲線代表透過 fZM model 所產生的 expected value。
 
-#### 2.5 Estimating Lexical Coverage
+### 3. 實作 Lexical Coverage Estimation
 
-我們可以藉由 Out-Of-Vocabulary (OOV) types 的比例來了解分析兩個 corpus 的 lexical coverage，也就是讀者能讀懂的單詞所佔的比例。基本上，一個實用的語言資源中，OOV 所佔的比例應保持在一定標準之下。
+#### 3.1 Out-Of-Vocabulary (OOV) types 
+
+我們可以藉由 Out-Of-Vocabulary (OOV) types 的比例來了解分析兩個 corpus 的 lexical coverage，也就是可被辨認的單詞所佔的比例。基本上，一個實用的語言資源中，OOV 所佔的比例應保持在一定標準之下。
 
 我們先採兩 corpus 的前 100k 個 lemma：
 
@@ -235,11 +237,7 @@ gossip100k.spc <- tfl2spc(gossip100k.tfl)
 dcard100k.spc <- tfl2spc(dcard100k.tfl)
 ```
 
-````{r}
-# vocabulary size
-V(gossip100k.spc)
-V(dcard100k.spc)
-```
+首先，我們要計算 lexical of seen types。也就是說，我們想要知道語料中至少出現過兩次的單詞總共有幾個。計算方式是整個 vocabulary size 減掉其中只出現過一次的詞的數量。
 
 ```{r}
 gossip_Vseen <- V(gossip100k.spc) - Vm(gossip100k.spc, 1)
@@ -248,15 +246,93 @@ gossip_Vseen
 dcard_Vseen
 ```
 
+這樣我們就可以計算八卦板與 Dcard 語料中 OOV 所佔的比例，大約分別是 0.545 與 0.591。
+
 ```{r}
-gossip_Vseen / V(gossip100k.spc)
-dcard_Vseen / V(dcard100k.spc)
+1 - gossip_Vseen / V(gossip100k.spc)
+1 - dcard_Vseen / V(dcard100k.spc)
 ```
+
+如果我們再進一步看 *hapax legomena* (只出現一次的詞) 在整個語料中的佔比，
 
 ```{r}
 Vm(gossip100k.spc, 1) / N(gossip100k.spc)
 Vm(dcard100k.spc, 1) / N(dcard100k.spc)
 ```
+
+就可以發現，我們剛才所計算的 `gossip_Vseen` 和 `dcard_Vseen` cover 到各 92% 的 token。剩下的 8% 就屬於 OOV。
+
+#### 3.2 Fitting the LNRE Model
+
+這次我們使用 `zm` model：
+
+```{r}
+gossip100k.zm <- lnre("zm", gossip100k.spc)
+dcard100k.zm <- lnre("zm", dcard100k.spc)
+```
+
+以八卦板與廖為例，假設我們用 1、10，和 1 億個 tokens 進行計算，expected OOV 分別會是：
+
+```{r}
+1 - (gossip_Vseen / EV(gossip100k.zm, c(1e6, 10e6, 100e6)))
+```
+
+相同的計算方式在 Dcard 語料中再試一次，expected OOV 分別會是：
+
+```{r}
+1 - (dcard_Vseen / EV(dcard100k.zm, c(1e6, 10e6, 100e6)))
+```
+
+```{r}
+#EV(fzm_g, c(1e6, 10e6, 100e6))
+#EV(fzm_d, c(1e6, 10e6, 100e6))
+```
+
+#### 3.3 Estimating the Proportion of OOV Tokens in Larger Samples
+
+首先計算八卦板語料的 expected *Voov*：
+
+```{r}
+EV(gossip100k.zm, N(gossip.spc)) - gossip_Vseen
+```
+
+接下來，我們可以藉由調整出現頻率的數字，來得知哪一個 expected frequency class 可以讓我們最靠近 expected *Voov*。
+
+```{r}
+gossip.zm.spc <- lnre.spc(gossip100k.zm, N(gossip.spc))
+sum(Vm(gossip.zm.spc, 1))
+sum(Vm(gossip.zm.spc, 1:20))
+sum(Vm(gossip.zm.spc, 1:56))
+```
+
+根據上述方法，可以得知 frequency class 1 到 56 的 types 總和最接近 expected *Voov*。所以現在我們可以計算 *Noov*：
+ 
+```{r}
+gossip_Noov.zm <- sum(Vm(gossip.zm.spc, 1:56) * (1:56))
+gossip_Noov.zm
+gossip_Noov.zm / N(gossip.spc)
+```
+
+最後得知在八卦板中約有 10% 的 token 屬於 OOV。同樣的方法在 Dcard corpus 中再做一次：
+
+```{r}
+EV(dcard100k.zm, N(dcard.spc)) - dcard_Vseen
+
+dcard.zm.spc <- lnre.spc(dcard100k.zm, N(dcard.spc))
+sum(Vm(dcard.zm.spc, 1))
+sum(Vm(dcard.zm.spc, 1:3))
+
+dcard_Noov.zm <- sum(Vm(dcard.zm.spc, 1:3) * (1:3))
+dcard_Noov.zm
+dcard_Noov.zm / N(dcard.spc)
+```
+
+在 Dcard 語料中約有 9% 的 token 屬於 OOV。
+
+
+
+
+
 
 
 
