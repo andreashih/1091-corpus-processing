@@ -1,0 +1,265 @@
+---
+title: "final_project"
+author: "andrea"
+date: "2021/1/6"
+output: html_document
+---
+
+這學期修了老闆的課──語料處理方法，認識了一個強大的 R 套件 [`zipfR`](https://cran.r-project.org/web/packages/zipfR/index.html) (Evert and Baroni 2007) 還有 LNRE model (Baayen 2001)。這篇文章將以 PTT 八卦板與 Dcard 語料為例，依據 [The zipfR package for lexical statistics: A tutorial introduction](https://rdrr.io/cran/zipfR/f/inst/doc/zipfr-tutorial.pdf) (Baroni and Evert 2014) 所提供的方法進行分析。
+
+### 1. 前導
+
+在使用 `zipfR` 之前，要先認識 [Zipf’s law](https://nlp.stanford.edu/IR-book/html/htmledition/zipfs-law-modeling-the-distribution-of-terms-1.html) (Zipf 1949)。如果簡單說明，即是在自然語言語料庫中，一個單詞出現的頻率越高，在頻率表裡的排名越前面。且第一名的單詞出現的頻率大約是第二名單詞的兩倍，也是第三名單詞的三倍，以此類推。
+
+接下來要了解 token 和 type 的意義。這裡有一個範例詞表：
+
+> 蘋果, 橘子, 香蕉, 香蕉, 葡萄, 蘋果, 香蕉, 蘋果, 葡萄, 蘋果, 葡萄, 蘋果
+
+這個範例詞表總共有 12 個 token (sample size = 12)，以及 4 個 type (vocabulary size = 4)。在這裡我們把它表示成
+
+> N = 12
+> V = 4
+
+根據範例詞表，我們可以得到一個 **type-frequency list**:
+
+| w    | fw |
+|------|----|
+| 蘋果 | 5  |
+| 橘子 | 1  |
+| 香蕉 | 3  |
+| 葡萄 | 3  |
+
+接著，我們又可以得到一個 **Zipf Ranking**:
+
+| w    | r | fr |
+|------|---|----|
+| 蘋果 | 1 | 5  |
+| 香蕉 | 2 | 3  |
+| 葡萄 | 3 | 3  |
+| 橘子 | 4 | 1  |
+
+透過 **Zipf Ranking**，我們就可以得到一個計算上非常重要的資料：**frequency spectrum** :
+
+| m | Vm |
+|---|----|
+| 1 | 1  |
+| 3 | 2  |
+| 5 | 1  |
+
+在這裡，m 表示出現的頻率次數，Vm 表示這個頻率次數的單詞有幾個。所以這個例子中，出現一次的單詞有一個 (橘子)，出現三次的單詞有兩個 (香蕉、葡萄)，出現五次的單詞有一個 (蘋果)。只出現過一次的單詞，我們稱之為 *hapax legomena*。*hapax legomena* 在本研究中可能是斷詞錯誤所造成，接下來將會進行探索。
+
+### 2. 實作
+
+首先，把 PTT 八卦板和 Dcard 語料整理匯入並整理。這裡先將兩 corpus 存成兩個 character vector。
+
+```{r message=FALSE}
+library(zipfR)
+library(readr)
+
+# load files
+g05 <- readLines("data\\Gossiping_2005_seg.txt", encoding="UTF-8")
+g10 <- readLines("data\\Gossiping_2010_seg.txt", encoding="UTF-8")
+g15 <- readLines("data\\Gossiping_2015_seg.txt", encoding="UTF-8")
+g20 <- readLines("data\\Gossiping_2020_seg.txt", encoding="UTF-8")
+
+g05 <- unlist(strsplit(g05, "\\s"))
+g10 <- unlist(strsplit(g10, "\\s"))
+g15 <- unlist(strsplit(g15, "\\s"))
+g20 <- unlist(strsplit(g20, "\\s"))
+
+gossip_corpus <- c(g05, g10, g15, g20)
+dcard_corpus <- readLines("data\\dcard_corpus.txt", encoding="UTF-8")
+```
+
+#### 2.1 Type-frequency List
+
+使用 `zipfR` 套件，可以簡單地得到兩個 corpus 的 type-frequency list。
+
+```{r}
+gossip.tfl <- vec2tfl(gossip_corpus)
+dcard.tfl <- vec2tfl(dcard_corpus)
+```
+
+以下是兩個 corpus 的 sample size 和 type count：
+
+```{r}
+N(gossip.tfl) # sample size
+V(gossip.tfl) # type count
+```
+
+```{r}
+N(dcard.tfl) # sample size
+V(dcard.tfl) # type count
+```
+
+`zipfR` 也可以讓我們輕鬆將資料視覺化：
+
+```{r}
+par(mfrow=c(1,2)) # 1*2 plot area
+plot(gossip.tfl, main="PTT-Gossiping", log="xy", # logarithmic scale
+     xlab="rank", ylab="frequency")
+plot(dcard.tfl, main="Dcard", log="xy",
+     xlab="rank", ylab="frequency")
+```
+
+#### 2.2 Frequency Spectra
+
+透過剛剛的 frequency list，我們可以得到兩個 corpus 的 frequency spectra：
+
+```{r}
+gossip.spc <- tfl2spc(gossip.tfl)
+dcard.spc <- tfl2spc(dcard.tfl)
+```
+
+取 log 值後，下圖提供前五十筆 spectrum element 的資料：
+
+```{r}
+par(mfrow=c(1,2))
+plot(dcard.spc, log="x", main="Dcard",
+     xlab="m", ylab="Vm")
+plot(gossip.spc, log="x", main="PTT-Gossiping",
+     xlab="m", ylab="Vm")
+```
+
+從上圖可以得知，*hapax legomena* (只出現過一次的單詞) 占整個語料庫的比例相當的高。接下來，我們可以透過 Vocabulary growth curves (VGC) 來觀察新詞增加的情況。
+
+#### 2.3 Vocabulary Growth Curves (VGC)
+
+同樣地，透過 `zipfR`，我們可以將兩個 corpus 轉成 `vgc` object。
+
+```{r}
+gossip.vgc <- vec2vgc(gossip_corpus, m.max=2)
+dcard.vgc <- vec2vgc(dcard_corpus, m.max=2)
+```
+
+來看一下 `dcard.vgc` 裡面是什麼。
+
+```{r}
+head(dcard.vgc)
+```
+
+以 row 2 為例，在前 2010 個 token 中，共有 756 個 type，而在其中有 504  個單詞 只出現過一次。
+
+我們將資料畫成圖表：
+
+```{r}
+par(mfrow=c(1,2))
+plot(gossip.vgc, add.m=1, main="PTT-Gossiping",
+     xlab="N", ylab="V(N)/V1(N)")
+plot(dcard.vgc, add.m=1, main="Dcard",
+     xlab="N", ylab="V(N)/V1(N)")
+```
+
+上圖中顏色較深的曲線是 V，較淺的曲線是 V1。從圖中可以發現兩 corpus 的 V1 曲線都十分陡峭，而且呈現持續上升的趨勢，其中 Dcard corpus 的 V1 曲線又比 PTT 八卦板還來得陡。V1 曲線不斷上升，有可能是因為中文斷詞錯誤所造成 (Hsieh 2014)。如果用內建的 BrownNoun corpus (英文語料，字與字之間由空白分隔，所以沒有斷詞錯誤的問題) 進行比較，就可以很明顯地發現兩 corpus 的 V1 曲線與逐漸穩定的 BrownNoun corpus 有所不同。
+
+```{r}
+data(BrownNoun.emp.vgc)
+
+par(mfrow=c(1,3))
+plot(BrownNoun.emp.vgc, add.m=1, main="BrownNoun",
+     xlab="N", ylab="V(N)/V1(N)")
+plot(gossip.vgc, add.m=1, main="PTT-Gossiping",
+     xlab="N", ylab="V(N)/V1(N)")
+plot(dcard.vgc, add.m=1, main="Dcard",
+     xlab="N", ylab="V(N)/V1(N)")
+```
+
+透過 VGC，我們可以推測如果持續進行抽樣，就會不斷的出現新詞 (new types)，vocabulary size 也會一直增加。所以在這裡的 V 值並不穩定。如果我們要推得 corpus 的真實情況，須借助 Large-Number-
+of-Rare-Events (LNRE) models (Baayen 2001)。
+
+#### 2.4 Fitting the LNRE Model
+
+`zipfR` 套件中提供了三種 LNRE models，分別是 Generalized In-
+verse Gauss Poisson (`lnre.gigp`; Baayen, 2001, ch. 4), Zipf-Mandelbrot (`lnre.zm`;
+Evert, 2004) and finite Zipf-Mandelbrot (`lnre.fzm`; Evert, 2004). 我們首先採用 `fzm`。
+
+```{r}
+fzm_g <- lnre("fzm", spc=gossip.spc)
+fzm_d <- lnre("fzm", spc=dcard.spc)
+```
+
+我們可以畫出 observed 和 expected spectra：
+
+```{r}
+fzm_g.spc <- lnre.spc(fzm_g, N(gossip.spc))
+fzm_d.spc <- lnre.spc(fzm_d, N(dcard.spc))
+
+par(mfrow=c(1,2)) # 1*2 plot area
+plot(gossip.spc, fzm_g.spc,
+     main="PTT-Gossiping", xlab="m", ylab="Vm")
+legend("topright", legend = c("observed", "fZM model"), 
+       fill = 1:2, cex = 0.75)
+plot(dcard.spc, fzm_d.spc,
+     main="Dcard", xlab="m", ylab="Vm")
+legend("topright", legend = c("observed", "fZM model"), 
+       fill = 1:2, cex = 0.75)
+```
+
+以及 observed 和 expected VGC：
+
+```{r}
+fzm_g.vgc <- lnre.vgc(fzm_g, N(gossip.vgc), m.max=1, variances=TRUE)
+fzm_d.vgc <- lnre.vgc(fzm_d, N(dcard.vgc), m.max=1, variances=TRUE)
+
+par(mfrow=c(1,2)) # 1*2 plot area
+plot(gossip.vgc, fzm_g.vgc, add.m=1,
+     main="PTT-Gossiping", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", legend = c("observed", "fZM model"),
+       fill = 1:2, cex = 0.5)
+plot(dcard.vgc, fzm_d.vgc, add.m=1,
+     main="Dcard", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", legend = c("observed", "fZM model"),
+       fill = 1:2, cex = 0.5)
+```
+
+上方的紅色曲線代表透過 fZM model 所產生的 expected value。
+
+#### 2.5 Estimating Lexical Coverage
+
+我們可以藉由 Out-Of-Vocabulary (OOV) types 的比例來了解分析兩個 corpus 的 lexical coverage，也就是讀者能讀懂的單詞所佔的比例。基本上，一個實用的語言資源中，OOV 所佔的比例應保持在一定標準之下。
+
+我們先採兩 corpus 的前 100k 個 lemma：
+
+```{r}
+gossip100k <- head(gossip_corpus, 100000)
+dcard100k <- head(dcard_corpus, 100000)
+```
+
+同樣地，將他們轉成 `spc` object：
+
+```{r}
+gossip100k.tfl <- vec2tfl(gossip100k)
+dcard100k.tfl <- vec2tfl(dcard100k)
+
+gossip100k.spc <- tfl2spc(gossip100k.tfl)
+dcard100k.spc <- tfl2spc(dcard100k.tfl)
+```
+
+````{r}
+# vocabulary size
+V(gossip100k.spc)
+V(dcard100k.spc)
+```
+
+```{r}
+gossip_Vseen <- V(gossip100k.spc) - Vm(gossip100k.spc, 1)
+dcard_Vseen <- V(dcard100k.spc) - Vm(dcard100k.spc, 1)
+gossip_Vseen
+dcard_Vseen
+```
+
+```{r}
+gossip_Vseen / V(gossip100k.spc)
+dcard_Vseen / V(dcard100k.spc)
+```
+
+```{r}
+Vm(gossip100k.spc, 1) / N(gossip100k.spc)
+Vm(dcard100k.spc, 1) / N(dcard100k.spc)
+```
+
+
+
+
+
+
