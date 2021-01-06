@@ -329,6 +329,20 @@ dcard_Noov.zm / N(dcard.spc)
 
 在 Dcard 語料中約有 9% 的 token 屬於 OOV。
 
+```{r}
+gossip10M.zm.spc <- lnre.spc(gossip100k.zm, 10e6)
+sum(Vm(gossip10M.zm.spc, 1:12) * (1:12)) # cloest to 500000
+sum(Vm(gossip10M.zm.spc, 1:12))
+EV(gossip100k.zm, 10e6) - sum(Vm(gossip10M.zm.spc, 1:12))
+```
+
+```{r}
+dcard10M.zm.spc <- lnre.spc(dcard100k.zm, 10e6)
+sum(Vm(dcard10M.zm.spc, 1:11) * (1:11)) # cloest to 500000
+sum(Vm(dcard10M.zm.spc, 1:11))
+EV(dcard100k.zm, 10e6) - sum(Vm(dcard10M.zm.spc, 1:11))
+```
+
 ### 4. 結論
 
 
