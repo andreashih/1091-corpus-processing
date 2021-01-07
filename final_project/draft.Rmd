@@ -1,0 +1,61 @@
+---
+title: "draft"
+author: "andrea"
+date: "2021/1/7"
+output: html_document
+---
+
+#### 3.3 Estimating the Proportion of OOV Tokens in Larger Samples
+
+首先計算八卦板語料的 expected *Voov*：
+
+```{r}
+EV(gossip100k.zm, N(gossip.spc)) - gossip_Vseen
+```
+
+接下來，我們可以藉由調整出現頻率的數字，來得知哪一個 expected frequency class 可以讓我們最靠近 expected *Voov*。
+
+```{r}
+gossip.zm.spc <- lnre.spc(gossip100k.zm, N(gossip.spc))
+sum(Vm(gossip.zm.spc, 1))
+sum(Vm(gossip.zm.spc, 1:20))
+sum(Vm(gossip.zm.spc, 1:56))
+```
+
+根據上述方法，可以得知 frequency class 1 到 56 的 types 總和最接近 expected *Voov*。所以現在我們可以計算 *Noov*：
+ 
+```{r}
+gossip_Noov.zm <- sum(Vm(gossip.zm.spc, 1:56) * (1:56))
+gossip_Noov.zm
+gossip_Noov.zm / N(gossip.spc)
+```
+
+最後得知在八卦板中約有 10% 的 token 屬於 OOV。同樣的方法在 Dcard corpus 中再做一次：
+
+```{r}
+EV(dcard100k.zm, N(dcard.spc)) - dcard_Vseen
+
+dcard.zm.spc <- lnre.spc(dcard100k.zm, N(dcard.spc))
+sum(Vm(dcard.zm.spc, 1))
+sum(Vm(dcard.zm.spc, 1:3))
+
+dcard_Noov.zm <- sum(Vm(dcard.zm.spc, 1:3) * (1:3))
+dcard_Noov.zm
+dcard_Noov.zm / N(dcard.spc)
+```
+
+在 Dcard 語料中約有 9% 的 token 屬於 OOV。
+
+```{r}
+gossip10M.zm.spc <- lnre.spc(gossip100k.zm, 10e6)
+sum(Vm(gossip10M.zm.spc, 1:12) * (1:12)) # cloest to 500000
+sum(Vm(gossip10M.zm.spc, 1:12))
+EV(gossip100k.zm, 10e6) - sum(Vm(gossip10M.zm.spc, 1:12))
+```
+
+```{r}
+dcard10M.zm.spc <- lnre.spc(dcard100k.zm, 10e6)
+sum(Vm(dcard10M.zm.spc, 1:11) * (1:11)) # cloest to 500000
+sum(Vm(dcard10M.zm.spc, 1:11))
+EV(dcard100k.zm, 10e6) - sum(Vm(dcard10M.zm.spc, 1:11))
+```
