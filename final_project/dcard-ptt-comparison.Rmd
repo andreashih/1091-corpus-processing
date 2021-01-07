@@ -278,28 +278,39 @@ Vm(dcard100k.spc, 1) / N(dcard100k.spc)
 
 #### 3.2 Fitting the LNRE Model
 
+在這裡使用的是 `zm` model，並且會將結果與 Brown corpus 做比較：
+
 ```{r}
+data("Brown100k.spc")
+Brown_Vseen <- V(Brown100k.spc) - Vm(Brown100k.spc, 1)
+
+Brown100k.zm <- lnre("zm", Brown100k.spc)
 gossip100k.zm <- lnre("zm", gossip100k.spc)
 dcard100k.zm <- lnre("zm", dcard100k.spc)
 ```
 
-以八卦板語料為例，假設我們用 `1, 10, or 100
+以 Brown corpus 為例，假設我們用 `1, 10, or 100
 million tokens` 進行計算，expected OOV 分別會是：
 
 ```{r}
-1 - (gossip_Vseen / EV(gossip_fzm, c(1e6, 10e6, 100e6)))
+1 - (Brown_Vseen / EV(Brown100k.zm, c(1e6, 10e6, 100e6)))
+```
+
+八卦板的三個數值則是：
+
+```{r}
+1 - (gossip_Vseen / EV(gossip100k.zm, c(1e6, 10e6, 100e6)))
 ```
 
 相同的計算方式在 Dcard 語料中再試一次，expected OOV 分別會是：
 
 ```{r}
-1 - (dcard_Vseen / EV(dcard_fzm, c(1e6, 10e6, 100e6)))
+1 - (dcard_Vseen / EV(dcard100k.zm, c(1e6, 10e6, 100e6)))
 ```
 
 可以發現八卦板和 Dcard 語料的 OOV ratio 隨著 corpus size 的增加不斷地上升。我們用 Brown corpus 的資料來比較看看：
 
 ```{r}
-data("Brown100k.spc")
 Brown_fzm <- lnre("fzm", Brown100k.spc)
 Brown_Vseen <- V(Brown100k.spc) - Vm(Brown100k.spc, 1)
 1 - (Brown_Vseen / EV(Brown_fzm, c(1e6, 10e6, 100e6)))
