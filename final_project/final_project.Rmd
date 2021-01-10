@@ -364,3 +364,5 @@ Hsieh, S.-K. (2014, may). Why Chinese Web-as-Corpus is Wacky? Or: How Big Data i
 ### 6. Special Thanks
 
 謝謝 Jessy 和 Yongfu 在 [HOCOR 2020](https://github.com/lopentu/Hands-on_Corpus_Linguistics) 提供的 corpus data。
+
+Click here for poster version (made with [posterdown](https://github.com/brentthorne/posterdown))

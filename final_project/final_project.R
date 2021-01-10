@@ -182,6 +182,3 @@ dcard100k.fzm <- lnre("fzm", dcard100k.spc)
 1 - (Brown_Vseen / EV(Brown100k.fzm, c(1e6, 10e6, 100e6)))
 1 - (ptt_Vseen / EV(ptt100k.fzm, c(1e6, 10e6, 100e6)))
 1 - (dcard_Vseen / EV(dcard100k.fzm, c(1e6, 10e6, 100e6)))
-
-
-
