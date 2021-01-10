@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+<title>index.utf8</title>
+
+
+
+
+
+
+<!--
+Font-awesome icons ie github or twitter
+-->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/brands.css" integrity="sha384-n9+6/aSqa9lBidZMRCQHTHKJscPq6NW4pCQBiMmHdUCvPN8ZOg2zJJTkC7WIezWv" crossorigin="anonymous">
+
+<!--
+Google fonts api stuff
+-->
+<link href='https://fonts.googleapis.com/css?family=Special Elite' rel='stylesheet'>
+<link href='https://fonts.googleapis.com/css?family=Rasa' rel='stylesheet'>
+
+<!--
+Here are the required style attributes for css to make this poster work :)
+-->
+<style>
+@page {
+size: 33.1in 23.3in;
+margin: 0;
+padding: 0;
+background-color: #ffffff;
+}
+body {
+margin: 0px;
+padding: 0px;
+width: 33.1in;
+height: 23.3in;
+text-align: justify;
+font-size: 25.35pt;
+background-color: #FFFFFF;
+color: #000000;
+}
+/* RMarkdown Class Styles */
+/* center align leaflet map,
+from https://stackoverflow.com/questions/52112119/center-leaflet-in-a-rmarkdown-document */
+.html-widget {
+margin: auto;
+position: sticky;
+margin-top: 2cm;
+margin-bottom: 2cm;
+}
+.leaflet.html-widget.html-widget-static-bound.leaflet-container.leaflet-touch.leaflet-fade-anim.leaflet-grab.leaflet-touch-drag.leaflet-touch-zoom {
+position: sticky;
+width: 100%;
+}
+pre.sourceCode.r, pre.sourceCode.python {
+background-color: #ffffff20;
+border: solid #BA5536 1mm;
+border-radius: 0.5em;
+padding: 4mm;
+margin: auto;
+margin-top: 1em;
+margin-bottom: 1em;
+/* align-items: center; */
+}
+div.sourceCode {
+background-color: transparent;
+width: 85%;
+margin-left: auto;
+margin-right: auto;
+}
+code.sourceCode.r, code.sourceCode.python {
+background-color: transparent;
+font-size: 20pt;
+border-radius: 2mm;
+}
+code {
+font-size: 25pt;
+font-family: monospace;
+background-color: #BA553624;
+color: #BA5536;
+padding: 1.2mm;
+line-height: 1;
+border-radius: 2mm;
+}
+caption {
+margin-bottom: 10px;
+font-size: 0.72em;
+font-style: italic;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #A4382020;
+}
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td{
+  border-spacing: 0;
+  font-size: 40%;
+  border-style: none;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-right: 1em;
+  padding-left: 1em;
+  line-height: 1em;
+}
+table {
+  margin: auto;
+}
+th {
+  padding-left: 5mm;
+  padding-right: 5mm;
+}
+.caption {
+font-size: 20pt;
+font-style: italic;
+padding-top: 0;
+}
+.references {
+font-size: 0.75em;
+line-height: 90%;
+}
+/* Create three unequal columns that floats next to each other */
+.column {
+float: left;
+padding: 0px;
+}
+.outer {
+width: 33.1in;
+height: 23.3in;
+-webkit-column-count: 2; /* Chrome, Safari, Opera */
+-moz-column-count: 2; /* Firefox */
+column-count: 2;
+-webkit-column-fill: auto;
+-moz-column-fill: auto;
+column-fill: auto;
+-webkit-column-rule-width: 0.5;
+-moz-column-rule-width: 0.5;
+column-rule-width: 0.5;
+-webkit-column-rule-style: solid;
+-moz-column-rule-style: solid;
+column-rule-style: solid;
+-webkit-column-rule-color: black;
+-moz-column-rule-color: black;
+column-rule-color: black;
+-webkit-column-gap: 50%;
+background-color: #ffffff;
+font-family: Rasa;
+color: #000000;
+}
+span.citation {
+  color: #BA5536;
+  font-weight: bold;
+}
+a {
+text-decoration: none;
+color: #BA5536;
+}
+#title {
+font-size: 2.525em;
+text-align: left;
+margin: 0;
+line-height: 90%;
+border-bottom: 0;
+}
+#author {
+color: #A43820;
+margin: 0;
+text-align: left;
+line-height: 65%;
+font-size: 1.17em;
+}
+#affiliation {
+padding-top: 1em;
+color: #00000060;
+font-style: italic;
+font-size: 0.85em;
+margin: 0;
+}
+sup {
+color: #cc0000;
+}
+.affiliation sup {
+font-size: 20px;
+}
+.author sup {
+font-size: 30px;
+}
+.author_extra {
+color: #BA5536;
+margin: 0;
+line-height: 85%;
+font-size: 0.9em;
+}
+.outer h1 {
+text-align: center;
+margin-top: 0.5in;
+margin-bottom: 0.5in;
+}
+.outer h2 {
+text-align: center;
+}
+.outer p {
+color: #000000;
+}
+.outer ol {
+text-align: left;
+}
+.main {
+width: calc(33.1in * 0.5);
+height: 23.3in;
+position: absolute;
+margin-left: calc(33.1in * 0.25);
+background-color: #A43820;
+color: #FFFFFF90;
+font-family: Special Elite;
+background-image: linear-gradient(#A43820 50%, #BA5536);
+}
+.main strong {
+color: #FFFFFF;
+}
+img.main-img-left {
+width: 20%;
+left: 0.5in;
+bottom: 0.2in;
+position: absolute;
+}
+img.main-img-right {
+width: 18%;
+right: 0.5in;
+bottom: 0.2in;
+position: absolute;
+}
+.main p {
+padding-top: 20%;
+font-size: 4.5em;
+text-align: left;
+}
+.fab {
+color: #00000060;
+font-size: 25px;
+}
+.twitter, i {
+color: #00000060;
+font-size: 35px;
+text-decoration: none;
+}
+a.email {
+text-decoration: none;
+color: #00000060;
+font-size: 35px;
+}
+.envelope {
+color: #00000060;
+font-size: 5px;
+text-decoration: none;
+}
+.globe {
+color: #00000060;
+font-size: 5px;
+text-decoration: none;
+}
+.github > .fab {
+color: #00000060;
+font-size: 40px;
+text-decoration: none;
+}
+.globetext {
+color: #00000060;
+font-size: 35px;
+text-decoration: none;
+}
+.poster_wrap {
+width: 33.1in;
+height: 23.3in;
+padding: 0cm;
+background-color: #ffffff;
+}
+span > #tab:mytable {
+  font-weight: bold;
+}
+.section {
+  padding-left: 10mm;
+  padding-right: 10mm;
+}
+.main p {
+  padding-left: 30mm;
+  padding-right: 30mm;
+}
+.main_pic {
+  width: 40%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.orcid img {
+  width: 3%;
+}
+</style>
+</head>
+<body>
+
+
+<div class="poster_wrap">
+<div class="column outer">
+<br>
+<div class="title section">
+<h1 id="title"><div class="line-block">Estimating Word Segmentation Errors<br />
+in PTT and Dcard Corpus</div></h1>
+<br>
+<h3 id="author" class="author">
+
+Cing-Fang Shih<sup> </sup><br>
+
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:r08142004@ntu.edu.tw" class="email">r08142004@ntu.edu.tw</a> <br>
+<a class='github'><i class="fab fa-github"></i></a><a class='globetext' href="https://github.com/andreashih"> &nbsp;@andreashih</a>
+</h3>
+
+<h5 id="author_extra" class="author_extra">
+</h5>
+
+<p id="affiliation" class="affiliation">
+<sup></sup> Graduate Institute of Linguistics, National Taiwan University
+</p>
+
+</div>
+<p><link rel="stylesheet" href="custom.css"></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Nowadays, <em>Web-as-Corpus</em> (WaC) <span class="citation">[<a href="#ref-kilgarriff2003">1</a>]</span> has become the main approach in corpus-based linguistics studies. Extracting information from the web is efficient for building a large corpus. However, word segmentation errors can cause several problems because (a) the emergence of new words is too rapid to catch up with and (b) the lack of Chinese word boundaries makes the pre-processing even more challenging. This study is a follow-up study of Hsieh (2014) <span class="citation">[<a href="#ref-hsieh2014">2</a>]</span> that aims to inspect whether recent WaC encounters difficulties of word segmentation errors.</p>
+</div>
+<div id="methods" class="section level1">
+<h1>Methods</h1>
+<p>This study utilizes the <em>zipfR</em> package <span class="citation">[<a href="#ref-evert2007">3</a>]</span> to analyze the lexical richness and the lexical coverage of two web corpora, which are the PTT corpus and the Dcard corpus. After being fitted to the LNRE model <span class="citation">[<a href="#ref-baayen2002">4</a>]</span>, the lexical richness will be observed by their vocabulary growth curves (VGC) and the lexical coverage will be estimated by their Out-of-Vocabulary (OOV) rates. The results will be compared with the Academia Sinica Balanced Corpus (ASBC), whose word boundary delimitation is corrected manually, and the Brown corpus, in which words are already separated by spaces.</p>
+</div>
+<div id="results" class="section level1">
+<h1>Results</h1>
+<p>The results of the vocabulary growth curves (VGC) and Out-of-Vocabulary (OOV) rates are presented below:</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-2"></span>
+<img src="https://andreashih.github.io/img/rmd_posts/zipfr/all_vgc_exp.png" alt="The observed and expected VGC of four different corpora" width="75%" />
+<p class="caption">
+Figure 1: The observed and expected VGC of four different corpora
+</p>
+</div>
+<p>In Figure 1, the thinner red curves refer to the estimated V1, which is the expected type frequency when the type occurs only once. The V1 curves of ASBC and Brown corpus are smoother than those of PTT and Dcard corpus.</p>
+<p>In Table 1, the expected OOV rate in ASBC and Brown are less than those in PTT and Dcard corpus. Besides, they are more stable while the corpora sizes expand.</p>
+<table>
+<caption>
+<span id="tab:unnamed-chunk-3">Table 1: </span>Expected OOV rate of the four corpora at the corpus sizes of 1M, 10M, and 100M
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Corpus
+</th>
+<th style="text-align:right;">
+N1_OOV
+</th>
+<th style="text-align:right;">
+N10_OOV
+</th>
+<th style="text-align:right;">
+N100_OOV
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ASBC
+</td>
+<td style="text-align:right;">
+0.7751460
+</td>
+<td style="text-align:right;">
+0.7844322
+</td>
+<td style="text-align:right;">
+0.7844322
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Brown
+</td>
+<td style="text-align:right;">
+0.7299293
+</td>
+<td style="text-align:right;">
+0.7347804
+</td>
+<td style="text-align:right;">
+0.7347804
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PTT
+</td>
+<td style="text-align:right;">
+0.8847203
+</td>
+<td style="text-align:right;">
+0.9098196
+</td>
+<td style="text-align:right;">
+0.9098338
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dcard
+</td>
+<td style="text-align:right;">
+0.8608032
+</td>
+<td style="text-align:right;">
+0.8905452
+</td>
+<td style="text-align:right;">
+0.8905602
+</td>
+</tr>
+</tbody>
+</table>
+<p>From the comparison of the four corpora, it can be concluded that WaC such as PTT and Dcard corpus are more likely to encounter segmentation problems, which lead to a high proportion of OOVs. Therefore, segmentation errors should be carefully treated when building Chinese WaC.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-kilgarriff2003">
+<p>[1] A. Kilgarriff and G. Grefenstette, “Introduction to the Special Issue on the Web as Corpus,” <em>Computational Linguistics</em>, vol. 29, no. 3, pp. 333–347, 2003, doi: <a href="https://doi.org/10.1162/089120103322711569">10.1162/089120103322711569</a>.</p>
+</div>
+<div id="ref-hsieh2014">
+<p>[2] S.-K. Hsieh, “Why Chinese Web-as-Corpus is Wacky? Or: How Big Data is Killing Chinese Corpus Linguistics,” in <em>Proceedings of the Ninth International Conference on Language Resources and Evaluation (LREC’14)</em>, May 2014, pp. 2386–2389, [Online]. Available: <a href="http://www.lrec-conf.org/proceedings/lrec2014/pdf/843_Paper.pdf">http://www.lrec-conf.org/proceedings/lrec2014/pdf/843_Paper.pdf</a>.</p>
+</div>
+<div id="ref-evert2007">
+<p>[3] S. Evert and M. Baroni, “zipfR: Word Frequency Modeling in R,” in <em>Proceedings of the 45th Annual Meeting of the Association for Computational Linguistics Companion Volume Proceedings of the Demo and Poster Sessions</em>, Jun. 2007, pp. 29–32, [Online]. Available: <a href="https://www.aclweb.org/anthology/P07-2008">https://www.aclweb.org/anthology/P07-2008</a>.</p>
+</div>
+<div id="ref-baayen2002">
+<p>[4] R. H. Baayen, <em>Word frequency distributions</em>, vol. 18. Springer Science &amp; Business Media, 2002.</p>
+</div>
+</div>
+</div>
+
+</div>
+<div class="main">
+<p>Word Segmentation Errors can lead to a severe problem in Chinese Web-as-Corpus<br><img src="https://andreashih.github.io/img/rmd_posts/zipfr/qr-code.png" class="main_pic" /></p>
+<img src="https://andreashih.github.io/img/rmd_posts/zipfr/lope.jpg" class="main-img-left" />
+<img src="https://img.yongfu.name/affiliations/GIL.png" class="main-img-right" />
+</div>
+</div>
+
+
+
+</body>
+</html>
