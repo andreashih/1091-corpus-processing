@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-這學期修了老闆的課──語料處理方法，認識了一個強大的 R 套件 [`zipfR`](https://cran.r-project.org/web/packages/zipfR/index.html) (Evert and Baroni 2007) 以及 LNRE model (Baayen 2002)。這篇文章將參考老師的研究 (Hsieh 2014)，並依據 [The zipfR package for lexical statistics: A tutorial introduction](https://rdrr.io/cran/zipfR/f/inst/doc/zipfr-tutorial.pdf) (Baroni and Evert 2014) 所提供的方法，以 PTT 八卦板與 Dcard 的語料進行中文斷詞問題的分析。
+這學期修了老闆的課──語料處理方法，認識了一個強大的 R 套件 [`zipfR`](https://cran.r-project.org/web/packages/zipfR/index.html) (Evert and Baroni 2007) 以及 LNRE model (Baayen 2002)。這篇文章將參考老師的研究 (Hsieh 2014)，並依據 [The zipfR package for lexical statistics: A tutorial introduction](https://rdrr.io/cran/zipfR/f/inst/doc/zipfr-tutorial.pdf) (Baroni and Evert 2014) 所提供的方法，以 PTT 與 Dcard 的語料進行中文斷詞問題的分析。
 
 ### 1. Introduction
 
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 > 蘋果, 橘子, 香蕉, 香蕉, 葡萄, 蘋果, 香蕉, 蘋果, 葡萄, 蘋果, 葡萄, 蘋果
 
-這個詞表總共有 12 個 token (sample size = 12)，以及 4 個 type (vocabulary size = 4)。在這裡我們把它表示成
+這個詞表總共有 12 個 token (sample size = 12)，以及 4 個 type (vocabulary size = 4)。在這裡我們把它表示成 :
 
 > N = 12
 
@@ -57,59 +57,76 @@ knitr::opts_chunk$set(
 
 ### 2. Lexical Richness
 
-首先，將 PTT 八卦板和 Dcard 語料匯入並整理。
-
-```{r message=FALSE}
+```{r message=FALSE, warning=FALSE}
+# 載入套件
 library(zipfR)
 library(readr)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+```
 
-# load files
-g05 <- readLines("data\\Gossiping_2005_seg.txt", encoding="UTF-8")
-g10 <- readLines("data\\Gossiping_2010_seg.txt", encoding="UTF-8")
-g15 <- readLines("data\\Gossiping_2015_seg.txt", encoding="UTF-8")
-g20 <- readLines("data\\Gossiping_2020_seg.txt", encoding="UTF-8")
+首先，將平衡語料庫 (ASBC)、PTT 和 Dcard 語料匯入並整理。PTT 語料來自 `2005`、`2010`、`2015`，以及 `2020` 共四個年度的八卦板與女板，且對其進行抽樣。
+
+```{r message=FALSE}
+#asbc
+asbc_corpus <- paste0(readLines("data\\asbc.txt", n=10000, encoding = 'UTF-8'),collapse=" ")
+asbc_corpus <- unlist(strsplit(asbc_corpus, "\\s"))
+
+# PTT Gossiping board (sampled)
+g05 <- sample(readLines("data\\Gossiping_2005_seg.txt", encoding="UTF-8"), 1250)
+g10 <- sample(readLines("data\\Gossiping_2010_seg.txt", encoding="UTF-8"), 1250)
+g15 <- sample(readLines("data\\Gossiping_2015_seg.txt", encoding="UTF-8"), 1250)
+g20 <- sample(readLines("data\\Gossiping_2020_seg.txt", encoding="UTF-8"), 1250)
 
 g05 <- unlist(strsplit(g05, "\\s"))
 g10 <- unlist(strsplit(g10, "\\s"))
 g15 <- unlist(strsplit(g15, "\\s"))
 g20 <- unlist(strsplit(g20, "\\s"))
 
-gossip_corpus <- c(g10, g15, g20)
+# PTT WomenTalk board (sampled)
+w05 <- sample(readLines("data\\WomenTalk_2005_seg.txt", encoding="UTF-8"), 1250)
+w10 <- sample(readLines("data\\WomenTalk_2010_seg.txt", encoding="UTF-8"), 1250)
+w15 <- sample(readLines("data\\WomenTalk_2015_seg.txt", encoding="UTF-8"), 1250)
+w20 <- sample(readLines("data\\WomenTalk_2020_seg.txt", encoding="UTF-8"), 1250)
+
+w05 <- unlist(strsplit(w05, "\\s"))
+w10 <- unlist(strsplit(w10, "\\s"))
+w15 <- unlist(strsplit(w15, "\\s"))
+w20 <- unlist(strsplit(w20, "\\s"))
+
+ptt_corpus <- c(g05, g10, g15, g20, w05, w10, w15, w20)
+
+# dcard
 dcard_corpus <- readLines("data\\dcard_corpus.txt", encoding="UTF-8")
 ```
 
 #### 2.1 Type-frequency List
 
-使用 `zipfR` 套件，可以簡單地得到兩個 corpus 的 type-frequency list 和它的 Zipf ranking。
+使用 `zipfR` 套件，可以簡單地得到 type-frequency list 和它的 Zipf ranking。為了進行接下來的比較，在這裡將套件內建的 `Brown.tfl` 一併匯入。
 
 ```{r}
-gossip.tfl <- vec2tfl(gossip_corpus)
+asbc.tfl <- vec2tfl(asbc_corpus)
+data("Brown.tfl")
+ptt.tfl <- vec2tfl(ptt_corpus)
 dcard.tfl <- vec2tfl(dcard_corpus)
 ```
 
-看一下資料的樣子：
+看一下資料的樣子。其中 `k` 代表 Zipf's ranking，`f` 代表頻率，`N` 是 sample size，`V` 是 type count：
 
 ```{r}
-head(gossip.tfl)
-```
-
-以下是兩個 corpus 的 sample size 和 type count：
-
-```{r}
-N(gossip.tfl) # sample size
-V(gossip.tfl) # type count
-```
-
-```{r}
-N(dcard.tfl) # sample size
-V(dcard.tfl) # type count
+head(ptt.tfl)
 ```
 
 `zipfR` 也可以讓我們輕鬆將資料視覺化：
 
 ```{r}
-par(mfrow=c(1,2)) # 1*2 plot area
-plot(gossip.tfl, main="PTT-Gossiping", log="xy", # logarithmic scale
+par(mfrow=c(2,2)) # 2*2 plot area
+plot(asbc.tfl, main="ASBC", log="xy", # logarithmic scale
+     xlab="rank", ylab="frequency")
+plot(Brown.tfl, main="Brown", log="xy", 
+     xlab="rank", ylab="frequency")
+plot(ptt.tfl, main="PTT", log="xy", 
      xlab="rank", ylab="frequency")
 plot(dcard.tfl, main="Dcard", log="xy",
      xlab="rank", ylab="frequency")
@@ -117,73 +134,71 @@ plot(dcard.tfl, main="Dcard", log="xy",
 
 #### 2.2 Frequency Spectrum
 
-透過剛剛的 frequency list，我們可以得到兩個 corpus 的 frequency spectrum：
+透過剛剛的 type-frequency list，我們可以得到 frequency spectrum。Brown corpus 的 frequency spectrum 可直接從套件中匯入：
 
 ```{r}
-gossip.spc <- tfl2spc(gossip.tfl)
+asbc.spc <- tfl2spc(asbc.tfl)
+data("Brown.spc")
+ptt.spc <- tfl2spc(ptt.tfl)
 dcard.spc <- tfl2spc(dcard.tfl)
 ```
 
-看一下資料的樣子：
+看一下資料的樣子。此處的 `m` 是指出現次數，`Vm` 代表出現該次數的 type 共有幾個：
 
 ```{r}
-head(gossip.spc)
+head(ptt.spc)
 ```
 
 取 log 值後，下圖提供前五十筆 spectrum element 的資料：
 
 ```{r}
-par(mfrow=c(1,2))
-plot(gossip.spc, log="x", main="PTT-Gossiping",
+par(mfrow=c(2,2))
+plot(asbc.spc, log="x", main="ASBC",
+     xlab="m", ylab="Vm")
+plot(Brown.spc, log="x", main="Brown",
+     xlab="m", ylab="Vm")
+plot(ptt.spc, log="x", main="PTT",
      xlab="m", ylab="Vm")
 plot(dcard.spc, log="x", main="Dcard",
      xlab="m", ylab="Vm")
 ```
 
-從上圖可以得知，*hapax legomena* (只出現過一次的單詞) 占兩個語料庫的比例都相當的高。接下來，我們可以透過 Vocabulary growth curves (VGC) 來觀察新詞增加的情況。
+從上圖可以得知，*hapax legomena* (只出現過一次的單詞) 占所有語料庫的比例都相當的高。接下來，我們可以透過 Vocabulary growth curves (VGC) 來觀察新詞增加的情況。
 
 #### 2.3 Vocabulary Growth Curves (VGC)
 
-同樣地，透過 `zipfR`，我們可以將兩個 corpus 轉成 `vgc` object。
+同樣地，透過 `zipfR`，我們可以將語料轉成 `vgc` object。Brown corpus 的資料一樣可以直接匯入：
 
 ```{r}
-gossip.vgc <- vec2vgc(gossip_corpus, m.max=2)
+asbc.vgc <- vec2vgc(asbc_corpus, m.max=2)
+data("Brown.emp.vgc")
+ptt.vgc <- vec2vgc(ptt_corpus, m.max=2)
 dcard.vgc <- vec2vgc(dcard_corpus, m.max=2)
 ```
 
-來看一下 `dcard.vgc` 裡面是什麼 :
+來看一下 `ptt.vgc` 裡面是什麼 :
 
 ```{r}
-head(dcard.vgc)
+head(ptt.vgc)
 ```
 
-以 row 2 為例，表示在前 `2010` 個 token 中，共有 `756` 個 type，而在其中有 `504` 個單詞只出現過一次。
+以 row 2 為例，表示在前 `392` 個 token 中，共有 `271` 個 type，而在其中有 `229` 個單詞只出現過一次。
 
 將資料畫成圖表：
 
 ```{r}
-par(mfrow=c(1,2))
-plot(gossip.vgc, add.m=1, main="PTT-Gossiping",
+par(mfrow=c(2,2))
+plot(asbc.vgc, add.m=1, main="ASBC",
+     xlab="N", ylab="V(N)/V1(N)")
+plot(Brown.emp.vgc, add.m=1, main="Brown",
+     xlab="N", ylab="V(N)/V1(N)")
+plot(ptt.vgc, add.m=1, main="PTT",
      xlab="N", ylab="V(N)/V1(N)")
 plot(dcard.vgc, add.m=1, main="Dcard",
      xlab="N", ylab="V(N)/V1(N)")
 ```
 
-上圖中顏色較深的曲線是 V，較淺的曲線是 V1。從圖中可以發現兩 corpus 的 V1 曲線都十分陡峭，而且呈現持續上升的趨勢，其中 Dcard corpus 的 V1 曲線又比 PTT 八卦板還來得陡。V1 曲線不斷上升，有可能是因為中文斷詞錯誤所造成 (Hsieh 2014)。如果用內建的 BrownNoun corpus (英文語料，字與字之間由空白分隔，所以沒有斷詞錯誤的問題) 進行比較，就可以很明顯地發現兩 corpus 的 V1 曲線與逐漸穩定的 BrownNoun corpus 有所不同：
-
-```{r}
-data(BrownNoun.emp.vgc)
-
-par(mfrow=c(1,3))
-plot(BrownNoun.emp.vgc, add.m=1, main="BrownNoun",
-     xlab="N", ylab="V(N)/V1(N)")
-plot(gossip.vgc, add.m=1, main="PTT-Gossiping",
-     xlab="N", ylab="V(N)/V1(N)")
-plot(dcard.vgc, add.m=1, main="Dcard",
-     xlab="N", ylab="V(N)/V1(N)")
-```
-
-透過 VGC，我們可以推測如果持續進行抽樣，就會不斷的出現新詞 (new types)，vocabulary size 也會一直增加。所以在這裡的 V 值並不穩定。如果我們要推得 corpus 的真實情況，須借助 Large-Number-
+上圖中顏色較深的曲線是 V，較淺的曲線是 V1。從圖中可以發現 ASBC 與 Brown corpus 的 V1 曲線上升後逐漸平緩，然而 PTT 與 Dcard 的 V1 曲線呈現持續上升的趨勢，意指隨著 sample size 增加，*hapax legomena* 也會不斷增加。這可能是中文斷詞錯誤所造成 (Hsieh 2014)。為了推得母體的真實情況，接下來將使用 Large-Number-
 of-Rare-Events (LNRE) models (Baayen 2002)。
 
 #### 2.4 Fitting the LNRE Model
@@ -193,39 +208,63 @@ verse Gauss Poisson (`lnre.gigp`; Baayen, 2001, ch. 4)、Zipf-Mandelbrot (`lnre.
 Evert, 2004)，和 finite Zipf-Mandelbrot (`lnre.fzm`; Evert, 2004)，我們首先採用 `fzm`。
 
 ```{r}
-gossip_fzm <- lnre("fzm", spc=gossip.spc)
-dcard_fzm <- lnre("fzm", spc=dcard.spc)
+asbc.fzm <- lnre("fzm", spc=asbc.spc)
+Brown.fzm <- lnre("fzm", spc=Brown.spc)
+ptt.fzm <- lnre("fzm", spc=ptt.spc)
+dcard.fzm <- lnre("fzm", spc=dcard.spc)
+
+# frequency spectrum
+asbc.fzm.spc <- lnre.spc(asbc.fzm, N(asbc.spc))
+Brown.fzm.spc <- lnre.spc(Brown.fzm, N(Brown.spc))
+ptt.fzm.spc <- lnre.spc(ptt.fzm, N(ptt.spc))
+dcard.fzm.spc <- lnre.spc(dcard.fzm, N(dcard.spc))
+
+# VGC
+asbc.fzm.vgc <- lnre.vgc(asbc.fzm, N(asbc.vgc), m.max=1, variances=TRUE)
+Brown.fzm.vgc <- lnre.vgc(Brown.fzm, N(Brown.emp.vgc), m.max=1, variances=TRUE)
+ptt.fzm.vgc <- lnre.vgc(ptt.fzm, N(ptt.vgc), m.max=1, variances=TRUE)
+dcard.fzm.vgc <- lnre.vgc(dcard.fzm, N(dcard.vgc), m.max=1, variances=TRUE)
 ```
 
-畫出 observed 和 expected spectra：
+Observed and expected frequency spectra:
 
 ```{r}
-gossip_fzm.spc <- lnre.spc(gossip_fzm, N(gossip.spc))
-dcard_fzm.spc <- lnre.spc(dcard_fzm, N(dcard.spc))
-
-par(mfrow=c(1,2)) # 1*2 plot area
-plot(gossip.spc, gossip_fzm.spc,
-     main="PTT-Gossiping", xlab="m", ylab="Vm")
+par(mfrow=c(2,2)) 
+plot(asbc.spc, asbc.fzm.spc,
+     main="ASBC", xlab="m", ylab="Vm")
 legend("topright", legend = c("observed", "fZM model"), 
-       fill = 1:2, cex = 0.75)
-plot(dcard.spc, dcard_fzm.spc,
+       fill = 1:2, cex = 0.5)
+plot(Brown.spc, Brown.fzm.spc,
+     main="Brown", xlab="m", ylab="Vm")
+legend("topright", legend = c("observed", "fZM model"), 
+       fill = 1:2, cex = 0.5)
+plot(ptt.spc, ptt.fzm.spc,
+     main="PTT", xlab="m", ylab="Vm")
+legend("topright", legend = c("observed", "fZM model"), 
+       fill = 1:2, cex = 0.5)
+plot(dcard.spc, dcard.fzm.spc,
      main="Dcard", xlab="m", ylab="Vm")
 legend("topright", legend = c("observed", "fZM model"), 
-       fill = 1:2, cex = 0.75)
+       fill = 1:2, cex = 0.5)
 ```
 
-比較八卦板與 Dcard 的 observed 和 expected VGC：
+Observed and expected VGC:
 
 ```{r}
-gossip_fzm.vgc <- lnre.vgc(gossip_fzm, N(gossip.vgc), m.max=1, variances=TRUE)
-dcard_fzm.vgc <- lnre.vgc(dcard_fzm, N(dcard.vgc), m.max=1, variances=TRUE)
-
-par(mfrow=c(1,2)) # 1*2 plot area
-plot(gossip.vgc, gossip_fzm.vgc, add.m=1,
-     main="PTT-Gossiping", xlab="N", ylab="V(N)/V1(N)")
+par(mfrow=c(2,2)) 
+plot(asbc.vgc, asbc.fzm.vgc, add.m=1,
+     main="ASBC", xlab="N", ylab="V(N)/V1(N)")
 legend("topleft", legend = c("observed", "fZM model"),
        fill = 1:2, cex = 0.5)
-plot(dcard.vgc, dcard_fzm.vgc, add.m=1,
+plot(Brown.emp.vgc, Brown.fzm.vgc, add.m=1,
+     main="Brown", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", legend = c("observed", "fZM model"),
+       fill = 1:2, cex = 0.5)
+plot(ptt.vgc, ptt.fzm.vgc, add.m=1,
+     main="PTT", xlab="N", ylab="V(N)/V1(N)")
+legend("topleft", legend = c("observed", "fZM model"),
+       fill = 1:2, cex = 0.5)
+plot(dcard.vgc, dcard.fzm.vgc, add.m=1,
      main="Dcard", xlab="N", ylab="V(N)/V1(N)")
 legend("topleft", legend = c("observed", "fZM model"),
        fill = 1:2, cex = 0.5)
@@ -239,99 +278,78 @@ legend("topleft", legend = c("observed", "fZM model"),
 
 我們可以藉由 Out-Of-Vocabulary (OOV) types 的比例來了解分析兩個 corpus 的 lexical coverage，也就是可被辨認的單詞所佔的比例。基本上，一個實用的語言資源中，OOV 所佔的比例應保持在一定標準之下。
 
-我們先採兩 corpus 的前十萬個 lemma：
+我們先採前十萬個 lemma：
 
 ```{r}
-gossip100k <- head(gossip_corpus, 100000)
+asbc100k <- head(asbc_corpus, 100000)
+data("Brown100k.spc")
+ptt100k <- head(ptt_corpus, 100000)
 dcard100k <- head(dcard_corpus, 100000)
 ```
 
 同樣地，將他們轉成 `spc` object：
 
 ```{r}
-gossip100k.tfl <- vec2tfl(gossip100k)
+asbc100k.tfl <- vec2tfl(asbc100k)
+ptt100k.tfl <- vec2tfl(ptt100k)
 dcard100k.tfl <- vec2tfl(dcard100k)
 
-gossip100k.spc <- tfl2spc(gossip100k.tfl)
+asbc100k.spc <- tfl2spc(asbc100k.tfl)
+ptt100k.spc <- tfl2spc(ptt100k.tfl)
 dcard100k.spc <- tfl2spc(dcard100k.tfl)
 ```
 
 首先，我們要計算 lexical of seen types。也就是說，我們想要知道語料中至少出現過**兩次**的 type 總共有幾個：
 
 ```{r}
-gossip_Vseen <- V(gossip100k.spc) - Vm(gossip100k.spc, 1)
+asbc_Vseen <- V(asbc100k.spc) - Vm(asbc100k.spc, 1)
+Brown_Vseen <- V(Brown100k.spc) - Vm(Brown100k.spc, 1)
+ptt_Vseen <- V(ptt100k.spc) - Vm(ptt100k.spc, 1)
 dcard_Vseen <- V(dcard100k.spc) - Vm(dcard100k.spc, 1)
-
-gossip_Vseen
-dcard_Vseen
 ```
-
-這樣就可以算出在八卦板與 Dcard 語料前十萬個 lemma 中，*OOV types* 所佔的比例大約是 0.545 與 0.591。
-
-```{r}
-1 - gossip_Vseen / V(gossip100k.spc)
-1 - dcard_Vseen / V(dcard100k.spc)
-```
-
-如果我們再進一步看 *hapax legomena* (只出現一次的詞，在這裡也稱為 *OOV lemmas*) 在整個語料中的佔比，
-
-```{r}
-Vm(gossip100k.spc, 1) / N(gossip100k.spc)
-Vm(dcard100k.spc, 1) / N(dcard100k.spc)
-```
-
-就可以發現兩語料中 *OOV lemmas* 佔所有 tokens 的比例分別是 5% 和 8%。
 
 #### 3.2 Fitting the LNRE Model
 
-在這裡使用的是 `zm` model，並且會將結果與 Brown corpus 做比較：
-
 ```{r}
-data("Brown100k.spc")
-Brown_Vseen <- V(Brown100k.spc) - Vm(Brown100k.spc, 1)
-
-Brown100k.zm <- lnre("zm", Brown100k.spc)
-gossip100k.zm <- lnre("zm", gossip100k.spc)
-dcard100k.zm <- lnre("zm", dcard100k.spc)
+asbc100k.fzm <- lnre("fzm", asbc100k.spc)
+Brown100k.fzm <- lnre("fzm", Brown100k.spc)
+ptt100k.fzm <- lnre("fzm", ptt100k.spc)
+dcard100k.fzm <- lnre("fzm", dcard100k.spc)
 ```
 
 以 Brown corpus 為例，假設我們用 `1, 10, or 100
 million tokens` 進行計算，expected OOV 分別會是：
 
 ```{r}
-1 - (Brown_Vseen / EV(Brown100k.zm, c(1e6, 10e6, 100e6)))
+# ASBC
+1 - (asbc_Vseen / EV(asbc100k.fzm, c(1e6, 10e6, 100e6)))
 ```
-
-八卦板的三個數值則是：
 
 ```{r}
-1 - (gossip_Vseen / EV(gossip100k.zm, c(1e6, 10e6, 100e6)))
+# Brown
+1 - (Brown_Vseen / EV(Brown100k.fzm, c(1e6, 10e6, 100e6)))
 ```
-
-相同的計算方式在 Dcard 語料中再試一次，expected OOV 分別會是：
 
 ```{r}
-1 - (dcard_Vseen / EV(dcard100k.zm, c(1e6, 10e6, 100e6)))
+# PTT
+1 - (ptt_Vseen / EV(ptt100k.fzm, c(1e6, 10e6, 100e6)))
 ```
-
-可以發現八卦板和 Dcard 語料的 OOV ratio 隨著 corpus size 的增加不斷地上升。我們用 Brown corpus 的資料來比較看看：
 
 ```{r}
-Brown_fzm <- lnre("fzm", Brown100k.spc)
-Brown_Vseen <- V(Brown100k.spc) - Vm(Brown100k.spc, 1)
-1 - (Brown_Vseen / EV(Brown_fzm, c(1e6, 10e6, 100e6)))
+# Dcard
+1 - (dcard_Vseen / EV(dcard100k.fzm, c(1e6, 10e6, 100e6)))
 ```
 
-與八卦板與 Dcard 語料不同的是，Brown corpus 的 OOV ratio 相對穩定。
+從上方得到的數值可以發現，ASBC 和 Brown corpus 的 OOV ratio 較 PTT 和 Dcard 來得穩定且比例也較低。
 
 ### 4. 結論
-利用 `zipfR` 並採用 LNRE model 對資料進行分析，取得兩語料的 `VGC` 和 `OOV ratio`，就可以分析八卦板與 Dcard 語料的 lexical richness 和 lexical coverage。目前的發現是：
+利用 `zipfR` 並採用 LNRE model 對資料進行分析，取得語料的 `VGC` 和 `OOV ratio`，就可以分析平衡語料庫、Brown corpus、PTT 和 Dcard 的 lexical richness 和 lexical coverage。目前的發現是：
 
-(1) 不同於 BrownNoun 最後達成平緩的趨勢，八卦板與 Dcard 的 `VGC` V1 曲線都隨著 sample size 增加持續上升，且 Dcard 的斜率又較八卦板更大。
+(1) 不同於 ASBC 和 Brown Corpus 最後達成平緩的趨勢，PTT 與 Dcard 的 `VGC` V1 曲線都隨著 sample size 增加持續上升。
 
-(2) 從 expected OOV ratio 來看，八卦板與 Dcard 語料的 OOV 也隨著 corpus size 的增加持續上升，並不如 Brown corpus 穩定。
+(2) 從 expected OOV ratio 來看，PTT 與 Dcard 語料的 OOV 除比例較高外，也隨著 corpus size 的增加而持續上升，並不如 ASBC 與 Brown corpus 穩定。
 
-可能的原因是，Brown Corpus 是英文語料，字詞與字詞之間已以空白分隔，然而中文語料並無此特性，且前處理通常採用機器自動斷詞，若出現新詞則很有可能被斷開而成為 OOV。這說明了在建造中文 Web-as-Corpus (Kilgarriff and Grefenstette 2003) 時，斷詞問題是很重要的考量之一。
+可能的原因是，ASBC 是機器斷詞後再進行人工校正而成的語料庫，而 Brown Corpus 是英文語料，字詞與字詞之間已有空白分隔，所以這兩個語料庫較無斷詞錯誤導致新詞不斷增加的問題。然而現今的 Web-as-Corpus，其前處理通常採用機器自動斷詞，龐大的 OOV 可能來自於斷詞錯誤。這說明了在建造中文 Web-as-Corpus 時，斷詞問題是很重要的考量之一。
 
 ### 5. References
 
